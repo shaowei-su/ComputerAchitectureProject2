@@ -31,7 +31,7 @@ VL_MODULE(VMIPS_MIPS) {
     VL_IN8(block_read_fDM_valid,0,0);
     VL_IN8(block_write_fDM_valid,0,0);
     VL_IN8(block_read_fIM_valid,0,0);
-    VL_OUT8(__PVT__iBlkRead,0,0);
+    VL_OUT8(iBlkRead,0,0);
     VL_OUT8(SYS,0,0);
     VL_OUT(data_address_2DM,31,0);
     VL_IN(data_read_fDM,31,0);
@@ -45,6 +45,8 @@ VL_MODULE(VMIPS_MIPS) {
     VL_INW(block_read_fIM,255,0,8);
     
     // LOCAL SIGNALS
+    VL_SIG8(__PVT__mem_reqL1IM,0,0);
+    VL_SIG8(__PVT__hitL1IF,0,0);
     VL_SIG8(__PVT__WriteRegister1_MEMWB,4,0);
     VL_SIG8(__PVT__RegWrite1_MEMWB,0,0);
     VL_SIG8(data_write_size_2DC,1,0);
@@ -52,29 +54,40 @@ VL_MODULE(VMIPS_MIPS) {
     VL_SIG8(write_2DC,0,0);
     VL_SIG8(flush_2DC,0,0);
     VL_SIG8(data_valid_fDC,0,0);
-    //char	__VpadToAlign147[1];
+    //char	__VpadToAlign149[3];
     VL_SIG(__PVT__Instr1_IFID,31,0);
     VL_SIG(__PVT__Instr_PC_IFID,31,0);
     VL_SIG(__PVT__Instr_PC_Plus4_IFID,31,0);
     VL_SIG(Instr_address_2IC,31,0);
+    VL_SIG(__PVT__Instr1_fIC,31,0);
+    VL_SIG(__PVT__mem_addressL1IM,31,0);
     VL_SIG(__PVT__WriteData1_MEMWB,31,0);
     VL_SIG(data_write_2DC,31,0);
     VL_SIG(data_address_2DC,31,0);
     VL_SIG(data_read_fDC,31,0);
+    VL_SIGW(__PVT__instr_cache_L1__DOT__icache_data,273,0,9);
+    VL_SIG(__PVT__instr_cache_L1__DOT__i,31,0);
+    VL_SIG(__PVT__instr_cache_L1__DOT__read_address,31,0);
     VL_SIG(__PVT__MEM__DOT__data_read_aligned,31,0);
     VL_SIG(__PVT__MEM__DOT__MemWriteAddress,31,0);
     VL_SIG(__PVT__MEM__DOT__WriteData1,31,0);
+    VL_SIGW(__PVT__instr_cache_L1__DOT__icache[1024],273,0,9);
     
     // LOCAL VARIABLES
+    VL_SIG8(__Vdlyvset__instr_cache_L1__DOT__icache__v0,0,0);
     VL_SIG8(__Vdly__WriteRegister1_MEMWB,4,0);
     VL_SIG8(__Vdly__RegWrite1_MEMWB,0,0);
-    //char	__VpadToAlign198[2];
+    //char	__VpadToAlign37119[1];
+    VL_SIG16(__Vdlyvdim0__instr_cache_L1__DOT__icache__v0,9,0);
+    //char	__VpadToAlign37122[6];
+    VL_SIGW(__Vdlyvval__instr_cache_L1__DOT__icache__v0,273,0,9);
+    VL_SIG(__Vdly__instr_cache_L1__DOT__read_address,31,0);
     VL_SIG(__Vdly__Instr_PC_Plus4_IFID,31,0);
     VL_SIG(__Vdly__WriteData1_MEMWB,31,0);
     
     // INTERNAL VARIABLES
   private:
-    //char	__VpadToAlign212[4];
+    //char	__VpadToAlign37180[4];
     VMIPS__Syms*	__VlSymsp;		// Symbol table
   public:
     
@@ -99,8 +112,9 @@ VL_MODULE(VMIPS_MIPS) {
     static void	_initial__TOP__v__1(VMIPS__Syms* __restrict vlSymsp);
     static void	_sequent__TOP__v__2(VMIPS__Syms* __restrict vlSymsp);
     static void	_sequent__TOP__v__5(VMIPS__Syms* __restrict vlSymsp);
+    static void	_sequent__TOP__v__8(VMIPS__Syms* __restrict vlSymsp);
     static void	_settle__TOP__v__6(VMIPS__Syms* __restrict vlSymsp);
-    static void	_settle__TOP__v__8(VMIPS__Syms* __restrict vlSymsp);
+    static void	_settle__TOP__v__9(VMIPS__Syms* __restrict vlSymsp);
 } VL_ATTR_ALIGNED(128);
 
 #endif  /*guard*/

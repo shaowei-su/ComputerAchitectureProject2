@@ -98,7 +98,6 @@ void VMIPS::_settle__TOP__1(VMIPS__Syms* __restrict vlSymsp) {
     // Body
     vlTOPp->dBlkRead = 0U;
     vlTOPp->dBlkWrite = 0U;
-    vlTOPp->iBlkRead = 0U;
     vlTOPp->block_write_2DM[0U] = vlTOPp->block_read_fDM[0U];
     vlTOPp->block_write_2DM[1U] = vlTOPp->block_read_fDM[1U];
     vlTOPp->block_write_2DM[2U] = vlTOPp->block_read_fDM[2U];
@@ -128,6 +127,8 @@ void VMIPS::_sequent__TOP__3(VMIPS__Syms* __restrict vlSymsp) {
     VMIPS* __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
     vlTOPp->SYS = vlSymsp->TOP__v__ID.__PVT__SYS;
+    vlTOPp->iBlkRead = vlSymsp->TOP__v.__PVT__mem_reqL1IM;
+    vlTOPp->Instr_address_2IM = vlSymsp->TOP__v.__PVT__mem_addressL1IM;
 }
 
 void VMIPS::_settle__TOP__4(VMIPS__Syms* __restrict vlSymsp) {
@@ -135,9 +136,10 @@ void VMIPS::_settle__TOP__4(VMIPS__Syms* __restrict vlSymsp) {
     VMIPS* __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
     vlTOPp->SYS = vlSymsp->TOP__v__ID.__PVT__SYS;
+    vlTOPp->iBlkRead = vlSymsp->TOP__v.__PVT__mem_reqL1IM;
+    vlTOPp->Instr_address_2IM = vlSymsp->TOP__v.__PVT__mem_addressL1IM;
     vlTOPp->MemWrite_2DM = vlSymsp->TOP__v.write_2DC;
     vlTOPp->MemRead_2DM = vlSymsp->TOP__v.read_2DC;
-    vlTOPp->Instr_address_2IM = vlSymsp->TOP__v.Instr_address_2IC;
 }
 
 void VMIPS::_combo__TOP__5(VMIPS__Syms* __restrict vlSymsp) {
@@ -154,7 +156,6 @@ void VMIPS::_sequent__TOP__6(VMIPS__Syms* __restrict vlSymsp) {
     // Body
     vlTOPp->MemWrite_2DM = vlSymsp->TOP__v.write_2DC;
     vlTOPp->MemRead_2DM = vlSymsp->TOP__v.read_2DC;
-    vlTOPp->Instr_address_2IM = vlSymsp->TOP__v.Instr_address_2IC;
 }
 
 void VMIPS::_settle__TOP__8(VMIPS__Syms* __restrict vlSymsp) {
@@ -200,6 +201,7 @@ void VMIPS::_eval(VMIPS__Syms* __restrict vlSymsp) {
     if ((((IData)(vlTOPp->CLK) & (~ (IData)(vlTOPp->__Vclklast__TOP__CLK))) 
 	 | ((~ (IData)(vlTOPp->RESET)) & (IData)(vlTOPp->__Vclklast__TOP__RESET)))) {
 	vlTOPp->_sequent__TOP__6(vlSymsp);
+	vlSymsp->TOP__v._sequent__TOP__v__8(vlSymsp);
 	vlSymsp->TOP__v__ID._sequent__TOP__v__ID__7(vlSymsp);
 	vlSymsp->TOP__v__ID__RegFile._sequent__TOP__v__ID__RegFile__4(vlSymsp);
     }
@@ -236,7 +238,7 @@ void VMIPS::_eval_settle(VMIPS__Syms* __restrict vlSymsp) {
     vlSymsp->TOP__v__ID__RegFile._sequent__TOP__v__ID__RegFile__2(vlSymsp);
     vlSymsp->TOP__v__ID._settle__TOP__v__ID__5(vlSymsp);
     vlTOPp->_combo__TOP__5(vlSymsp);
-    vlSymsp->TOP__v._settle__TOP__v__8(vlSymsp);
+    vlSymsp->TOP__v._settle__TOP__v__9(vlSymsp);
     vlSymsp->TOP__v__ID._settle__TOP__v__ID__8(vlSymsp);
     vlSymsp->TOP__v__ID__RegFile._sequent__TOP__v__ID__RegFile__4(vlSymsp);
     vlTOPp->_settle__TOP__8(vlSymsp);
