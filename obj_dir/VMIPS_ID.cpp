@@ -25,6 +25,7 @@ VL_CTOR_IMP(VMIPS_ID) {
     __PVT__WriteRegister1_IN = VL_RAND_RESET_I(5);
     __PVT__WriteData1_IN = VL_RAND_RESET_I(32);
     __PVT__RegWrite1_IN = VL_RAND_RESET_I(1);
+    __PVT__hit = VL_RAND_RESET_I(1);
     __PVT__Alt_PC = VL_RAND_RESET_I(32);
     __PVT__Request_Alt_PC = VL_RAND_RESET_I(1);
     __PVT__Instr1_OUT = VL_RAND_RESET_I(32);
@@ -102,7 +103,7 @@ void VMIPS_ID::_sequent__TOP__v__ID__3(VMIPS__Syms* __restrict vlSymsp) {
     VL_DEBUG_IF(VL_PRINTF("        VMIPS_ID::_sequent__TOP__v__ID__3\n"); );
     VMIPS* __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
-    // ALWAYS at verilog//ID.v:274
+    // ALWAYS at verilog//ID.v:275
     if (vlTOPp->RESET) {
 	vlSymsp->TOP__v__ID.__PVT__Alt_PC = vlSymsp->TOP__v__ID.__PVT__Alt_PC1;
 	vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC = vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC1;

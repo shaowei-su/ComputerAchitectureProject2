@@ -35,6 +35,7 @@ module ID(
 	 //Actually write to register file?
 	 input RegWrite1_IN,
 	 
+     input hit,
 	 //Alternate PC for next fetch (branch/jump destination)
     output reg [31:0]Alt_PC,
     //Actually use alternate PC
@@ -269,7 +270,7 @@ RegFile RegFile (
 	 
 	 reg FORCE_FREEZE;
 	 reg INHIBIT_FREEZE;
-     assign WANT_FREEZE = ((FORCE_FREEZE | syscal1) && !INHIBIT_FREEZE);
+     assign WANT_FREEZE = ((FORCE_FREEZE | syscal1 | (!hit)) && !INHIBIT_FREEZE);
 	 
 always @(posedge CLK or negedge RESET) begin
 	if(!RESET) begin

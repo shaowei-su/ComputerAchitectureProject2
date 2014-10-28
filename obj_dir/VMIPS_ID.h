@@ -23,6 +23,7 @@ VL_MODULE(VMIPS_ID) {
     VL_IN8(__PVT__RESET,0,0);
     VL_IN8(__PVT__WriteRegister1_IN,4,0);
     VL_IN8(__PVT__RegWrite1_IN,0,0);
+    VL_IN8(__PVT__hit,0,0);
     VL_OUT8(__PVT__Request_Alt_PC,0,0);
     VL_OUT8(__PVT__ReadRegisterA1_OUT,4,0);
     VL_OUT8(__PVT__ReadRegisterB1_OUT,4,0);
@@ -38,7 +39,6 @@ VL_MODULE(VMIPS_ID) {
     VL_IN8(__PVT__BypassValid1_MEMID,0,0);
     VL_OUT8(__PVT__SYS,0,0);
     VL_OUT8(__PVT__WANT_FREEZE,0,0);
-    //char	__VpadToAlign19[1];
     VL_IN(__PVT__Instr1_IN,31,0);
     VL_IN(__PVT__Instr_PC_IN,31,0);
     VL_IN(__PVT__Instr_PC_Plus4_IN,31,0);

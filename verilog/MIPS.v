@@ -128,7 +128,6 @@ module MIPS (
         .STALL(STALL_IDIF),
         .Request_Alt_PC(Request_Alt_PC_IDIF),
         .Alt_PC(Alt_PC_IDIF),
-        .hit(hitL1IF),
         .Instr_address_2IM(Instr_address_2IC),
         .Instr1_fIM(Instr1_fIC)
     );
@@ -173,6 +172,7 @@ module MIPS (
 		.WriteRegister1_IN(WriteRegister1_MEMWB),
 		.WriteData1_IN(WriteData1_MEMWB),
 		.RegWrite1_IN(RegWrite1_MEMWB),
+        .hit(hitL1IF),
 		.Alt_PC(Alt_PC_IDIF),
 		.Request_Alt_PC(Request_Alt_PC_IDIF),
 		.Instr1_OUT(Instr1_IDEXE),

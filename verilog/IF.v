@@ -25,8 +25,6 @@ module  IF
     input Request_Alt_PC,
     //Alternate PC to load
     input [31:0] Alt_PC,
-
-    input hit,
     
     //Address from which we want to fetch an instruction
      output [31:0] Instr_address_2IM,
@@ -56,7 +54,7 @@ always @(posedge CLK or negedge RESET) begin
         Instr_PC_Plus4 <= 32'hBFC00000;
         $display("FETCH [RESET] Fetching @%x", Instr_PC_Plus4);
     end else if(CLK) begin
-        if(!STALL & hit) begin
+        if(!STALL) begin
                 Instr1_OUT <= Instr1_fIM;
                 Instr_PC_OUT <= Instr_address_2IM;
 `ifdef INCLUDE_IF_CONTENT
