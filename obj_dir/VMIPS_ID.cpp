@@ -70,6 +70,8 @@ VL_CTOR_IMP(VMIPS_ID) {
     __PVT__syscall_bubble_counter = VL_RAND_RESET_I(3);
     __PVT__FORCE_FREEZE = VL_RAND_RESET_I(1);
     __PVT__INHIBIT_FREEZE = VL_RAND_RESET_I(1);
+    __Vdly__Alt_PC = VL_RAND_RESET_I(32);
+    __Vdly__Request_Alt_PC = VL_RAND_RESET_I(1);
     __Vdly__syscall_bubble_counter = VL_RAND_RESET_I(3);
     __Vdly__INHIBIT_FREEZE = VL_RAND_RESET_I(1);
     __Vdly__WriteRegister1_OUT = VL_RAND_RESET_I(5);
@@ -95,6 +97,8 @@ void VMIPS_ID::_sequent__TOP__v__ID__1(VMIPS__Syms* __restrict vlSymsp) {
 	= vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter;
     vlSymsp->TOP__v__ID.__Vdly__INHIBIT_FREEZE = vlSymsp->TOP__v__ID.__PVT__INHIBIT_FREEZE;
     vlSymsp->TOP__v__ID.__Vdly__FORCE_FREEZE = vlSymsp->TOP__v__ID.__PVT__FORCE_FREEZE;
+    vlSymsp->TOP__v__ID.__Vdly__Alt_PC = vlSymsp->TOP__v__ID.__PVT__Alt_PC;
+    vlSymsp->TOP__v__ID.__Vdly__Request_Alt_PC = vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC;
     vlSymsp->TOP__v__ID.__Vdly__WriteRegister1_OUT 
 	= vlSymsp->TOP__v__ID.__PVT__WriteRegister1_OUT;
 }
@@ -103,135 +107,141 @@ void VMIPS_ID::_sequent__TOP__v__ID__3(VMIPS__Syms* __restrict vlSymsp) {
     VL_DEBUG_IF(VL_PRINTF("        VMIPS_ID::_sequent__TOP__v__ID__3\n"); );
     VMIPS* __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
-    // ALWAYS at verilog//ID.v:275
-    if (vlTOPp->RESET) {
-	vlSymsp->TOP__v__ID.__PVT__Alt_PC = vlSymsp->TOP__v__ID.__PVT__Alt_PC1;
-	vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC = vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC1;
-	if ((((5U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)) 
-	      | (4U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) 
-	     | (3U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) {
-	    vlSymsp->TOP__v__ID.__Vdly__syscall_bubble_counter 
-		= (7U & ((IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter) 
-			 - (IData)(1U)));
-	} else {
-	    if ((2U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) {
+    // ALWAYS at verilog//ID.v:282
+    if (VL_LIKELY(vlTOPp->RESET)) {
+	vlSymsp->TOP__v__ID.__Vdly__Alt_PC = ((IData)(vlSymsp->TOP__v.__PVT__hitL1IF)
+					       ? vlSymsp->TOP__v__ID.__PVT__Alt_PC1
+					       : vlSymsp->TOP__v__ID.__PVT__Alt_PC);
+	vlSymsp->TOP__v__ID.__Vdly__Request_Alt_PC 
+	    = ((IData)(vlSymsp->TOP__v.__PVT__hitL1IF)
+	        ? (IData)(vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC1)
+	        : (IData)(vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC));
+	if (VL_UNLIKELY(vlSymsp->TOP__v.__PVT__hitL1IF)) {
+	    if ((((5U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)) 
+		  | (4U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) 
+		 | (3U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) {
 		vlSymsp->TOP__v__ID.__Vdly__syscall_bubble_counter 
 		    = (7U & ((IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter) 
 			     - (IData)(1U)));
-		vlSymsp->TOP__v__ID.__PVT__SYS = ((0x28U 
-						   != (IData)(vlSymsp->TOP__v__ID.__PVT__ALU_control1)) 
-						  & (0x36U 
-						     != (IData)(vlSymsp->TOP__v__ID.__PVT__ALU_control1)));
-		vlSymsp->TOP__v__ID.__Vdly__INHIBIT_FREEZE = 1U;
 	    } else {
-		if ((1U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) {
+		if ((2U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) {
 		    vlSymsp->TOP__v__ID.__Vdly__syscall_bubble_counter 
 			= (7U & ((IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter) 
 				 - (IData)(1U)));
-		    vlSymsp->TOP__v__ID.__PVT__SYS = 0U;
-		    vlSymsp->TOP__v__ID.__Vdly__INHIBIT_FREEZE = 0U;
+		    vlSymsp->TOP__v__ID.__PVT__SYS 
+			= ((0x28U != (IData)(vlSymsp->TOP__v__ID.__PVT__ALU_control1)) 
+			   & (0x36U != (IData)(vlSymsp->TOP__v__ID.__PVT__ALU_control1)));
+		    vlSymsp->TOP__v__ID.__Vdly__INHIBIT_FREEZE = 1U;
 		} else {
-		    if ((0U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) {
+		    if ((1U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) {
+			vlSymsp->TOP__v__ID.__Vdly__syscall_bubble_counter 
+			    = (7U & ((IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter) 
+				     - (IData)(1U)));
+			vlSymsp->TOP__v__ID.__PVT__SYS = 0U;
 			vlSymsp->TOP__v__ID.__Vdly__INHIBIT_FREEZE = 0U;
+		    } else {
+			if ((0U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) {
+			    vlSymsp->TOP__v__ID.__Vdly__INHIBIT_FREEZE = 0U;
+			}
 		    }
 		}
 	    }
-	}
-	if (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
-	     & (0U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) {
-	    vlSymsp->TOP__v__ID.__Vdly__syscall_bubble_counter = 4U;
-	}
-	if (((((((8U == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
-			  << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) 
-		 | (0xdU == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
-			      << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) 
-		| (0xcU == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+	    if (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+		 & (0U == (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) {
+		vlSymsp->TOP__v__ID.__Vdly__syscall_bubble_counter = 4U;
+	    }
+	    if (((((((8U == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+			      << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) 
+		     | (0xdU == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+				  << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) 
+		    | (0xcU == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+				 << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) 
+		   | (0xbU == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+				<< 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) 
+		  | (9U == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
 			     << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) 
-	       | (0xbU == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
-			    << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) 
-	      | (9U == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
-			 << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter)))) 
-	     | (1U == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
-			<< 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))))) {
-	    vlSymsp->TOP__v__ID.__PVT__Instr1_OUT = 
-		((0xcU == vlSymsp->TOP__v.__PVT__Instr1_IFID)
-		  ? vlSymsp->TOP__v.__PVT__Instr1_IFID
-		  : 0U);
-	    vlSymsp->TOP__v__ID.__PVT__OperandA1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__OperandB1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__ReadRegisterA1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__ReadRegisterB1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__Vdly__WriteRegister1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__MemWriteData1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__RegWrite1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__ALU_Control1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__MemRead1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__MemWrite1_OUT = 0U;
-	    vlSymsp->TOP__v__ID.__PVT__ShiftAmount1_OUT = 0U;
-	} else {
-	    if (((0xaU == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
-			    << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) 
-		 | (0U == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+		 | (1U == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
 			    << 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))))) {
 		vlSymsp->TOP__v__ID.__PVT__Instr1_OUT 
-		    = vlSymsp->TOP__v.__PVT__Instr1_IFID;
-		vlSymsp->TOP__v__ID.__PVT__OperandA1_OUT 
-		    = vlSymsp->TOP__v__ID.__PVT__OpA1;
-		vlSymsp->TOP__v__ID.__PVT__OperandB1_OUT 
-		    = vlSymsp->TOP__v__ID.__PVT__OpB1;
-		vlSymsp->TOP__v__ID.__PVT__ReadRegisterA1_OUT 
-		    = (0x1fU & ((IData)(vlSymsp->TOP__v__ID.__PVT__link1)
-				 ? 0U : (vlSymsp->TOP__v.__PVT__Instr1_IFID 
-					 >> 0x15U)));
-		vlSymsp->TOP__v__ID.__PVT__ReadRegisterB1_OUT 
-		    = (0x1fU & ((IData)(vlSymsp->TOP__v__ID.__PVT__RegDst1)
-				 ? (vlSymsp->TOP__v.__PVT__Instr1_IFID 
-				    >> 0x10U) : 0U));
-		vlSymsp->TOP__v__ID.__PVT__MemWriteData1_OUT 
-		    = ((((IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1) 
-			 == (IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1_OUT)) 
-			& (IData)(vlSymsp->TOP__v__EXE.__PVT__ALU_result_async_valid1))
-		        ? vlSymsp->TOP__v__EXE.__PVT__ALU_result1
-		        : ((((IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1) 
-			     == (IData)(vlSymsp->TOP__v__EXE.__PVT__WriteRegister1_OUT)) 
-			    & (IData)(vlSymsp->TOP__v__EXE.__PVT__RegWrite1_OUT))
-			    ? vlSymsp->TOP__v.__PVT__MEM__DOT__WriteData1
+		    = ((0xcU == vlSymsp->TOP__v.__PVT__Instr1_IFID)
+		        ? vlSymsp->TOP__v.__PVT__Instr1_IFID
+		        : 0U);
+		vlSymsp->TOP__v__ID.__PVT__OperandA1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__OperandB1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__ReadRegisterA1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__ReadRegisterB1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__Vdly__WriteRegister1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__MemWriteData1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__RegWrite1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__ALU_Control1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__MemRead1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__MemWrite1_OUT = 0U;
+		vlSymsp->TOP__v__ID.__PVT__ShiftAmount1_OUT = 0U;
+	    } else {
+		if (((0xaU == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+				<< 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))) 
+		     | (0U == (((IData)(vlSymsp->TOP__v__ID.__PVT__syscal1) 
+				<< 3U) | (IData)(vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter))))) {
+		    vlSymsp->TOP__v__ID.__PVT__Instr1_OUT 
+			= vlSymsp->TOP__v.__PVT__Instr1_IFID;
+		    vlSymsp->TOP__v__ID.__PVT__OperandA1_OUT 
+			= vlSymsp->TOP__v__ID.__PVT__OpA1;
+		    vlSymsp->TOP__v__ID.__PVT__OperandB1_OUT 
+			= vlSymsp->TOP__v__ID.__PVT__OpB1;
+		    vlSymsp->TOP__v__ID.__PVT__ReadRegisterA1_OUT 
+			= (0x1fU & ((IData)(vlSymsp->TOP__v__ID.__PVT__link1)
+				     ? 0U : (vlSymsp->TOP__v.__PVT__Instr1_IFID 
+					     >> 0x15U)));
+		    vlSymsp->TOP__v__ID.__PVT__ReadRegisterB1_OUT 
+			= (0x1fU & ((IData)(vlSymsp->TOP__v__ID.__PVT__RegDst1)
+				     ? (vlSymsp->TOP__v.__PVT__Instr1_IFID 
+					>> 0x10U) : 0U));
+		    vlSymsp->TOP__v__ID.__PVT__MemWriteData1_OUT 
+			= ((((IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1) 
+			     == (IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1_OUT)) 
+			    & (IData)(vlSymsp->TOP__v__EXE.__PVT__ALU_result_async_valid1))
+			    ? vlSymsp->TOP__v__EXE.__PVT__ALU_result1
 			    : ((((IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1) 
-				 == (IData)(vlSymsp->TOP__v.__PVT__WriteRegister1_MEMWB)) 
-				& (IData)(vlSymsp->TOP__v.__PVT__RegWrite1_MEMWB))
-			        ? vlSymsp->TOP__v.__PVT__WriteData1_MEMWB
-			        : vlSymsp->TOP__v__ID__RegFile.__PVT__DataC1)));
-		vlSymsp->TOP__v__ID.__PVT__RegWrite1_OUT 
-		    = ((0U != (IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1)) 
-		       & (IData)(vlSymsp->TOP__v__ID.__PVT__RegWrite1));
-		vlSymsp->TOP__v__ID.__PVT__ALU_Control1_OUT 
-		    = vlSymsp->TOP__v__ID.__PVT__ALU_control1;
-		vlSymsp->TOP__v__ID.__PVT__MemRead1_OUT 
-		    = vlSymsp->TOP__v__ID.__PVT__MemRead1;
-		vlSymsp->TOP__v__ID.__PVT__MemWrite1_OUT 
-		    = vlSymsp->TOP__v__ID.__PVT__MemWrite1;
-		vlSymsp->TOP__v__ID.__PVT__ShiftAmount1_OUT 
-		    = (0x1fU & (vlSymsp->TOP__v.__PVT__Instr1_IFID 
-				>> 6U));
-		vlSymsp->TOP__v__ID.__PVT__Instr1_PC_OUT 
-		    = vlSymsp->TOP__v.__PVT__Instr_PC_IFID;
-		vlSymsp->TOP__v__ID.__Vdly__WriteRegister1_OUT 
-		    = vlSymsp->TOP__v__ID.__PVT__WriteRegister1;
+				 == (IData)(vlSymsp->TOP__v__EXE.__PVT__WriteRegister1_OUT)) 
+				& (IData)(vlSymsp->TOP__v__EXE.__PVT__RegWrite1_OUT))
+			        ? vlSymsp->TOP__v.__PVT__MEM__DOT__WriteData1
+			        : ((((IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1) 
+				     == (IData)(vlSymsp->TOP__v.__PVT__WriteRegister1_MEMWB)) 
+				    & (IData)(vlSymsp->TOP__v.__PVT__RegWrite1_MEMWB))
+				    ? vlSymsp->TOP__v.__PVT__WriteData1_MEMWB
+				    : vlSymsp->TOP__v__ID__RegFile.__PVT__DataC1)));
+		    vlSymsp->TOP__v__ID.__PVT__RegWrite1_OUT 
+			= ((0U != (IData)(vlSymsp->TOP__v__ID.__PVT__WriteRegister1)) 
+			   & (IData)(vlSymsp->TOP__v__ID.__PVT__RegWrite1));
+		    vlSymsp->TOP__v__ID.__PVT__ALU_Control1_OUT 
+			= vlSymsp->TOP__v__ID.__PVT__ALU_control1;
+		    vlSymsp->TOP__v__ID.__PVT__MemRead1_OUT 
+			= vlSymsp->TOP__v__ID.__PVT__MemRead1;
+		    vlSymsp->TOP__v__ID.__PVT__MemWrite1_OUT 
+			= vlSymsp->TOP__v__ID.__PVT__MemWrite1;
+		    vlSymsp->TOP__v__ID.__PVT__ShiftAmount1_OUT 
+			= (0x1fU & (vlSymsp->TOP__v.__PVT__Instr1_IFID 
+				    >> 6U));
+		    vlSymsp->TOP__v__ID.__PVT__Instr1_PC_OUT 
+			= vlSymsp->TOP__v.__PVT__Instr_PC_IFID;
+		    vlSymsp->TOP__v__ID.__Vdly__WriteRegister1_OUT 
+			= vlSymsp->TOP__v__ID.__PVT__WriteRegister1;
+		}
 	    }
+	    VL_WRITEF("ID1:Instr=%x,Instr_PC=%x,Req_Alt_PC=%1u:Alt_PC=%x;SYS=%1u(%1u)\n",
+		      32,vlSymsp->TOP__v.__PVT__Instr1_IFID,
+		      32,vlSymsp->TOP__v.__PVT__Instr_PC_IFID,
+		      1,(IData)(vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC1),
+		      32,vlSymsp->TOP__v__ID.__PVT__Alt_PC1,
+		      1,(IData)(vlSymsp->TOP__v__ID.__PVT__syscal1),
+		      3,vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter);
+	    fflush (stdout);
 	}
-	VL_WRITEF("ID1:Instr=%x,Instr_PC=%x,Req_Alt_PC=%1u:Alt_PC=%x;SYS=%1u(%1u)\n",
-		  32,vlSymsp->TOP__v.__PVT__Instr1_IFID,
-		  32,vlSymsp->TOP__v.__PVT__Instr_PC_IFID,
-		  1,(IData)(vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC1),
-		  32,vlSymsp->TOP__v__ID.__PVT__Alt_PC1,
-		  1,(IData)(vlSymsp->TOP__v__ID.__PVT__syscal1),
-		  3,vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter);
-	fflush (stdout);
     } else {
 	VL_WRITEF("ID:RESET\n");
 	fflush (stdout);
-	vlSymsp->TOP__v__ID.__PVT__Alt_PC = 0U;
-	vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC = 0U;
+	vlSymsp->TOP__v__ID.__Vdly__Alt_PC = 0U;
+	vlSymsp->TOP__v__ID.__Vdly__Request_Alt_PC = 0U;
 	vlSymsp->TOP__v__ID.__PVT__Instr1_OUT = 0U;
 	vlSymsp->TOP__v__ID.__PVT__OperandA1_OUT = 0U;
 	vlSymsp->TOP__v__ID.__PVT__OperandB1_OUT = 0U;
@@ -252,6 +262,8 @@ void VMIPS_ID::_sequent__TOP__v__ID__3(VMIPS__Syms* __restrict vlSymsp) {
     }
     vlSymsp->TOP__v__ID.__PVT__syscall_bubble_counter 
 	= vlSymsp->TOP__v__ID.__Vdly__syscall_bubble_counter;
+    vlSymsp->TOP__v__ID.__PVT__Alt_PC = vlSymsp->TOP__v__ID.__Vdly__Alt_PC;
+    vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC = vlSymsp->TOP__v__ID.__Vdly__Request_Alt_PC;
     vlSymsp->TOP__v__ID.__PVT__WriteRegister1_OUT = vlSymsp->TOP__v__ID.__Vdly__WriteRegister1_OUT;
 }
 

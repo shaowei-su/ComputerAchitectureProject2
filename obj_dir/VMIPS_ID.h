@@ -77,10 +77,13 @@ VL_MODULE(VMIPS_ID) {
     VL_SIG(__PVT__rtval1,31,0);
     
     // LOCAL VARIABLES
+    VL_SIG8(__Vdly__Request_Alt_PC,0,0);
     VL_SIG8(__Vdly__syscall_bubble_counter,2,0);
     VL_SIG8(__Vdly__INHIBIT_FREEZE,0,0);
     VL_SIG8(__Vdly__WriteRegister1_OUT,4,0);
     VL_SIG8(__Vdly__FORCE_FREEZE,0,0);
+    //char	__VpadToAlign117[3];
+    VL_SIG(__Vdly__Alt_PC,31,0);
     
     // INTERNAL VARIABLES
   private:

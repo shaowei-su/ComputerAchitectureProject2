@@ -32,6 +32,7 @@ module  IF
 //     input [31:0]   PC_init,
      //Instruction received from instruction memory
      input [31:0]   Instr1_fIM
+
      
 );
 
@@ -47,6 +48,8 @@ assign Instr_address_2IM = Instr_PC_Plus4;  //Are you sure that this is correct?
 
 `endif
 
+
+
 always @(posedge CLK or negedge RESET) begin
     if(!RESET) begin
         Instr1_OUT <= 0;
@@ -59,6 +62,7 @@ always @(posedge CLK or negedge RESET) begin
                 Instr_PC_OUT <= Instr_address_2IM;
 `ifdef INCLUDE_IF_CONTENT
                 Instr_PC_Plus4 <= Instr_address_2IM + IncrementAmount;
+
                 $display("FETCH:Instr@%x=%x;Next@%x",Instr_address_2IM,Instr1_fIM,Instr_address_2IM + IncrementAmount);
 `else
                 /* You should probably assign something to Instr_PC_Plus4. */
@@ -66,7 +70,7 @@ always @(posedge CLK or negedge RESET) begin
                 $display("FETCH:ReqAlt[%d]=%x",Request_Alt_PC,Alt_PC);
 `endif
         end else begin
-            $display("FETCH: Stalling; next request will be %x",Instr_address_2IM);
+                $display("FETCH: Stalling; next request will be %x",Instr_address_2IM);
         end
     end
 end

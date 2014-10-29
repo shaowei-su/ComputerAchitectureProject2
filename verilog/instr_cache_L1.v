@@ -25,12 +25,15 @@ module instr_cache_L1(
 	reg [31:0] counter;
 	reg data_ready;
 	reg start_count;
+	reg data_loaded;
 
 
 
 
 	assign hit = icache_data[273] & (instr_addressIF[31:15] == icache_data[272:256]) ;
 	assign data_ready = (8==counter);
+	assign data_loaded = (9==counter);
+	assign icache_data = icache[instr_addressIF[14:5]];
 
 	initial
 	begin
@@ -46,37 +49,40 @@ module instr_cache_L1(
 	begin
 		if(!RESET)
 		begin
-		
-			icache_data <= 0;
 			mem_req <= 0;
 			mem_address <= 0;
 			start_count <= 0;
 		end
 		else begin
-			icache_data <= icache[instr_addressIF[14:5]];
-			$display("ICACHE:Now hit is %x and mem_valid is %x", hit, mem_valid);
-			if ((~hit)&(~mem_req))
+
+			
+			if ((~hit)&(counter==0))
 			begin
 				mem_req <= 1;
-				mem_address <= instr_addressIF;
+				mem_address <= {instr_addressIF[31:5],5'b0};
 				start_count <= 1;
 				
-				$display("ICACHE:Now read from address %x",instr_addressIF);
+				$display("ICACHE:Now read from address %x, and start_count:%x",instr_addressIF, start_count);
 			end
 				
 			if(mem_valid)
 			begin
-				mem_req <= 0;
 				mem_address <=0;
+				mem_req <=0;
+				$display("ICACHE: data:%x and now is valid", mem_data);
 
 			end
 			if(data_ready)
 			begin
-				start_count <= 0;
-				counter <= 0;
 				icache[instr_addressIF[14:5]] <= {1'b1, instr_addressIF[31:15], mem_data};
 				$display("ICACHE:Now save data: %x to %x, it is hit:%x", mem_data, instr_addressIF[14:5], hit);
 			end
+			if(data_loaded)
+			begin
+				start_count <= 0;
+				counter <= 0;
+			end
+			$display("ICACHE:Now hit is %x and mem_valid is %x, mem_req is %x, mem_address is %x", hit, mem_valid, mem_req, mem_address);
 		end	
 	end
 
@@ -100,9 +106,10 @@ module instr_cache_L1(
 		else if(start_count)
 		begin
 			counter <= counter + 1'b1;
-			$display("ICACHE:Now counter is %x", counter);
-		end
-			
+			$display("ICACHE:Now counter is %x", counter+1);
+		end	
+		
+
 	end
 
 

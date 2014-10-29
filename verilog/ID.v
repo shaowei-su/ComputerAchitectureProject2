@@ -137,7 +137,14 @@ module ID(
 
 //Begin branch/jump calculation
 	
-	wire [31:0] rsval_jump1;
+	 wire [31:0] rsval_jump1;
+     reg Request_Alt_PC2;
+     reg [31:0] Alt_PC2;
+
+     assign Request_Alt_PC2 = hit?Request_Alt_PC1:Request_Alt_PC;
+     assign Alt_PC2 = hit?Alt_PC1:Alt_PC;
+
+
 	
 `ifdef HAS_FORWARDING
 RegValue3 RegJumpValue1 (
@@ -270,7 +277,7 @@ RegFile RegFile (
 	 
 	 reg FORCE_FREEZE;
 	 reg INHIBIT_FREEZE;
-     assign WANT_FREEZE = ((FORCE_FREEZE | syscal1 | (!hit)) && !INHIBIT_FREEZE);
+     assign WANT_FREEZE = (((FORCE_FREEZE | syscal1) && !INHIBIT_FREEZE) | (!hit));
 	 
 always @(posedge CLK or negedge RESET) begin
 	if(!RESET) begin
@@ -295,8 +302,10 @@ always @(posedge CLK or negedge RESET) begin
 		INHIBIT_FREEZE <= 0;
 	$display("ID:RESET");
 	end else begin
-            Alt_PC <= Alt_PC1;
-            Request_Alt_PC <= Request_Alt_PC1;
+            Alt_PC <= Alt_PC2;
+            Request_Alt_PC <= Request_Alt_PC2;
+            if(hit)
+            begin
 			//$display("ID:evaluation SBC=%d; syscal1=%d",syscall_bubble_counter,syscal1);
 			case (syscall_bubble_counter)
 				5,4,3: begin
@@ -311,10 +320,11 @@ always @(posedge CLK or negedge RESET) begin
 					end
 				1: begin
 					//$display("ID:Decrement sbc, inhibit freeze, clear sys");
+
 					syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
 					SYS <= 0;
 					INHIBIT_FREEZE <=0;
-					end
+                    end
 				0: begin
 					//$display("ID:reenable freezes");
 					INHIBIT_FREEZE <=0;
@@ -359,6 +369,7 @@ always @(posedge CLK or negedge RESET) begin
                     ShiftAmount1_OUT <= shiftAmount1;
                     Instr1_PC_OUT <= Instr_PC_IN;
 					end
+                
 			endcase
 			/*if (RegWrite_IN) begin
 				Reg[WriteRegister_IN] <= WriteData_IN;
@@ -369,6 +380,8 @@ always @(posedge CLK or negedge RESET) begin
                 //$display("ID1:A:Reg[%d]=%x; B:Reg[%d]=%x; Write?%d to %d",RegA1, OpA1, RegB1, OpB1, (WriteRegister1!=5'd0)?RegWrite1:1'd0, WriteRegister1);
                 //$display("ID1:ALU_Control=%x; MemRead=%d; MemWrite=%d (%x); ShiftAmount=%d",ALU_control1, MemRead1, MemWrite1, MemWriteData1, shiftAmount1);
 			end
+            end
+        
 	end
 end
 	

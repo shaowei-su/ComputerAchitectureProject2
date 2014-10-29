@@ -76,18 +76,21 @@ VL_MODULE(VMIPS_MIPS) {
     
     // LOCAL VARIABLES
     VL_SIG8(__Vdly__mem_reqL1IM,0,0);
+    VL_SIG8(__Vdly__instr_cache_L1__DOT__start_count,0,0);
     VL_SIG8(__Vdlyvset__instr_cache_L1__DOT__icache__v0,0,0);
     VL_SIG8(__Vdly__WriteRegister1_MEMWB,4,0);
     VL_SIG8(__Vdly__RegWrite1_MEMWB,0,0);
+    //char	__VpadToAlign37121[1];
     VL_SIG16(__Vdlyvdim0__instr_cache_L1__DOT__icache__v0,9,0);
-    //char	__VpadToAlign37122[2];
-    VL_SIG(__Vdly__instr_cache_L1__DOT__counter,31,0);
+    VL_SIG(__Vdly__mem_addressL1IM,31,0);
     VL_SIGW(__Vdlyvval__instr_cache_L1__DOT__icache__v0,273,0,9);
+    VL_SIG(__Vdly__instr_cache_L1__DOT__counter,31,0);
     VL_SIG(__Vdly__Instr_PC_Plus4_IFID,31,0);
     VL_SIG(__Vdly__WriteData1_MEMWB,31,0);
     
     // INTERNAL VARIABLES
   private:
+    //char	__VpadToAlign37180[4];
     VMIPS__Syms*	__VlSymsp;		// Symbol table
   public:
     
@@ -108,14 +111,13 @@ VL_MODULE(VMIPS_MIPS) {
     // INTERNAL METHODS
     void __Vconfigure(VMIPS__Syms* symsp, bool first);
     static void	_combo__TOP__v__3(VMIPS__Syms* __restrict vlSymsp);
-    static void	_combo__TOP__v__8(VMIPS__Syms* __restrict vlSymsp);
+    static void	_combo__TOP__v__7(VMIPS__Syms* __restrict vlSymsp);
     static void	_initial__TOP__v__1(VMIPS__Syms* __restrict vlSymsp);
-    static void	_initial__TOP__v__5(VMIPS__Syms* __restrict vlSymsp);
     static void	_sequent__TOP__v__2(VMIPS__Syms* __restrict vlSymsp);
-    static void	_sequent__TOP__v__6(VMIPS__Syms* __restrict vlSymsp);
-    static void	_sequent__TOP__v__9(VMIPS__Syms* __restrict vlSymsp);
-    static void	_settle__TOP__v__10(VMIPS__Syms* __restrict vlSymsp);
-    static void	_settle__TOP__v__7(VMIPS__Syms* __restrict vlSymsp);
+    static void	_sequent__TOP__v__5(VMIPS__Syms* __restrict vlSymsp);
+    static void	_sequent__TOP__v__8(VMIPS__Syms* __restrict vlSymsp);
+    static void	_settle__TOP__v__6(VMIPS__Syms* __restrict vlSymsp);
+    static void	_settle__TOP__v__9(VMIPS__Syms* __restrict vlSymsp);
 } VL_ATTR_ALIGNED(128);
 
 #endif  /*guard*/
