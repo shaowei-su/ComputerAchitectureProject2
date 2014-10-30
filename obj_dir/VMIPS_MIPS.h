@@ -86,11 +86,13 @@ VL_MODULE(VMIPS_MIPS) {
     VL_SIGW(__Vdlyvval__instr_cache_L1__DOT__icache__v0,273,0,9);
     VL_SIG(__Vdly__instr_cache_L1__DOT__counter,31,0);
     VL_SIG(__Vdly__Instr_PC_Plus4_IFID,31,0);
+    VL_SIG(__Vdly__Instr1_IFID,31,0);
+    VL_SIG(__Vdly__Instr_PC_IFID,31,0);
     VL_SIG(__Vdly__WriteData1_MEMWB,31,0);
     
     // INTERNAL VARIABLES
   private:
-    //char	__VpadToAlign37180[4];
+    //char	__VpadToAlign37188[4];
     VMIPS__Syms*	__VlSymsp;		// Symbol table
   public:
     

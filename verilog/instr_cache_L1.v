@@ -31,8 +31,8 @@ module instr_cache_L1(
 
 
 	assign hit = icache_data[273] & (instr_addressIF[31:15] == icache_data[272:256]) ;
-	assign data_ready = (8==counter);
-	assign data_loaded = (9==counter);
+	assign data_ready = (6==counter);
+	assign data_loaded = (7==counter);
 	assign icache_data = icache[instr_addressIF[14:5]];
 
 	initial

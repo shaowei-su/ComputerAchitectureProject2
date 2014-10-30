@@ -83,7 +83,10 @@ module ID(
 	 //Tell the simulator to process a system call
 	 output reg SYS,
 	 //Tell fetch to stop advancing the PC, and wait.
-	 output WANT_FREEZE
+	 output WANT_FREEZE,
+     output reg [2:0]sys_count,
+     output Request_Alt_PC1,
+     output syscall_ins
     );
 	 
 	 wire [5:0]	ALU_control1;	//async. ALU_Control output
@@ -126,6 +129,11 @@ module ID(
      wire [15:0]    immediate1;
 
 	reg [2:0]	syscall_bubble_counter;
+
+     wire syscall_ins;
+
+
+     assign syscall_ins = syscal1;
 	
 	 
 	 
@@ -138,11 +146,7 @@ module ID(
 //Begin branch/jump calculation
 	
 	 wire [31:0] rsval_jump1;
-     reg Request_Alt_PC2;
-     reg [31:0] Alt_PC2;
 
-     assign Request_Alt_PC2 = hit?Request_Alt_PC1:Request_Alt_PC;
-     assign Alt_PC2 = hit?Alt_PC1:Alt_PC;
 
 
 	
@@ -302,9 +306,9 @@ always @(posedge CLK or negedge RESET) begin
 		INHIBIT_FREEZE <= 0;
 	$display("ID:RESET");
 	end else begin
-            Alt_PC <= Alt_PC2;
-            Request_Alt_PC <= Request_Alt_PC2;
-            if(hit)
+            Alt_PC <= Alt_PC1;
+            Request_Alt_PC <= WANT_FREEZE?0:Request_Alt_PC1;
+            sys_count <= syscall_bubble_counter;
             begin
 			//$display("ID:evaluation SBC=%d; syscal1=%d",syscall_bubble_counter,syscal1);
 			case (syscall_bubble_counter)
@@ -354,6 +358,7 @@ always @(posedge CLK or negedge RESET) begin
 					end
 				10,
 				0: begin
+                    begin
 					//$display("ID: send instr");
                     Instr1_OUT <= Instr1_IN;
                     OperandA1_OUT <= OpA1;
@@ -369,7 +374,7 @@ always @(posedge CLK or negedge RESET) begin
                     ShiftAmount1_OUT <= shiftAmount1;
                     Instr1_PC_OUT <= Instr_PC_IN;
 					end
-                
+                    end
 			endcase
 			/*if (RegWrite_IN) begin
 				Reg[WriteRegister_IN] <= WriteData_IN;
@@ -380,9 +385,9 @@ always @(posedge CLK or negedge RESET) begin
                 //$display("ID1:A:Reg[%d]=%x; B:Reg[%d]=%x; Write?%d to %d",RegA1, OpA1, RegB1, OpB1, (WriteRegister1!=5'd0)?RegWrite1:1'd0, WriteRegister1);
                 //$display("ID1:ALU_Control=%x; MemRead=%d; MemWrite=%d (%x); ShiftAmount=%d",ALU_control1, MemRead1, MemWrite1, MemWriteData1, shiftAmount1);
 			end
-            end
-        
-	end
+               
+	   end
+       end
 end
 	
     Decoder #(

@@ -31,7 +31,11 @@ module  IF
 //     //Address to use for first instruction to fetch when coming out of reset
 //     input [31:0]   PC_init,
      //Instruction received from instruction memory
-     input [31:0]   Instr1_fIM
+     input [31:0]   Instr1_fIM,
+     input SYS,
+     input  [2:0] sys_count,
+     input Request_Alt_PC1,
+     input syscall_ins
 
      
 );
@@ -69,8 +73,25 @@ always @(posedge CLK or negedge RESET) begin
                 $display("FETCH:Instr@%x=%x;Next@%x",Instr_address_2IM,Instr1_fIM,Instr_address_2IM + IncrementAmount);
                 $display("FETCH:ReqAlt[%d]=%x",Request_Alt_PC,Alt_PC);
 `endif
-        end else begin
-                $display("FETCH: Stalling; next request will be %x",Instr_address_2IM);
+        end else begin  
+            if(Request_Alt_PC)
+                Instr_PC_Plus4<=Instr_address_2IM;
+
+            if((!syscall_ins)&(!Request_Alt_PC1))
+            begin
+                Instr1_OUT <= 0;
+                Instr_PC_OUT <= 0;
+                $display("FETCH: Now clean the Instr1_OUT");
+            end        
+            if(SYS&(sys_count==2))
+                begin
+                Instr1_OUT <= 0;
+                Instr_PC_OUT <= 0;
+                $display("FETCH:SYSCALL IS %x", sys_count);
+                end
+
+
+            $display("FETCH: Stalling; next request will be %x and sys is %x, bubble sys_count is %x",Instr_address_2IM, SYS, sys_count);
         end
     end
 end

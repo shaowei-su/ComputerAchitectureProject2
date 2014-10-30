@@ -129,7 +129,11 @@ module MIPS (
         .Request_Alt_PC(Request_Alt_PC_IDIF),
         .Alt_PC(Alt_PC_IDIF),
         .Instr_address_2IM(Instr_address_2IC),
-        .Instr1_fIM(Instr1_fIC)
+        .Instr1_fIM(Instr1_fIC),
+        .SYS(SYS),
+        .sys_count(sys_count_IDIF),
+        .Request_Alt_PC1(Request_Alt_PC1_IDIF),
+        .syscall_ins(syscall_ins_IDIF)
     );
     
     wire [4:0]  WriteRegister1_MEMWB;
@@ -204,9 +208,16 @@ module MIPS (
 		.BypassValid1_MEMID(BypassValid1_MEMID),
 `endif
 		.SYS(SYS),
-		.WANT_FREEZE(STALL_IDIF)
+		.WANT_FREEZE(STALL_IDIF),
+        .sys_count(sys_count_IDIF),
+        .Request_Alt_PC1(Request_Alt_PC1_IDIF),
+        .syscall_ins(syscall_ins_IDIF)
 	);
 	
+    wire [2:0] sys_count_IDIF;
+    wire Request_Alt_PC1_IDIF;
+    wire syscall_ins_IDIF;
+
 	wire [31:0] Instr1_EXEMEM;
 	wire [31:0] Instr1_PC_EXEMEM;
 	wire [31:0] ALU_result1_EXEMEM;
@@ -216,6 +227,7 @@ module MIPS (
     wire [5:0]  ALU_Control1_EXEMEM;
     wire        MemRead1_EXEMEM;
     wire        MemWrite1_EXEMEM;
+
 `ifdef HAS_FORWARDING
     wire [31:0] ALU_result_async1;
     wire        ALU_result_async_valid1;

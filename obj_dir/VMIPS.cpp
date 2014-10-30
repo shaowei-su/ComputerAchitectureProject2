@@ -193,8 +193,8 @@ void VMIPS::_eval(VMIPS__Syms* __restrict vlSymsp) {
 	vlSymsp->TOP__v._sequent__TOP__v__5(vlSymsp);
 	vlSymsp->TOP__v__EXE._sequent__TOP__v__EXE__4(vlSymsp);
 	vlTOPp->_sequent__TOP__5(vlSymsp);
-	vlSymsp->TOP__v__ID._sequent__TOP__v__ID__4(vlSymsp);
 	vlSymsp->TOP__v__ID__RegFile._sequent__TOP__v__ID__RegFile__2(vlSymsp);
+	vlSymsp->TOP__v__ID._sequent__TOP__v__ID__4(vlSymsp);
     }
     if ((((IData)(vlTOPp->CLK) ^ (IData)(vlTOPp->__Vclklast__TOP__CLK)) 
 	 | ((~ (IData)(vlTOPp->RESET)) & (IData)(vlTOPp->__Vclklast__TOP__RESET)))) {
@@ -212,6 +212,10 @@ void VMIPS::_eval(VMIPS__Syms* __restrict vlSymsp) {
     }
     vlTOPp->_settle__TOP__10(vlSymsp);
     vlSymsp->TOP__v__ID._combo__TOP__v__ID__9(vlSymsp);
+    if ((((IData)(vlTOPp->CLK) & (~ (IData)(vlTOPp->__Vclklast__TOP__CLK))) 
+	 | ((~ (IData)(vlTOPp->RESET)) & (IData)(vlTOPp->__Vclklast__TOP__RESET)))) {
+	vlSymsp->TOP__v__ID._sequent__TOP__v__ID__10(vlSymsp);
+    }
     // Final
     vlTOPp->__Vclklast__TOP__CLK = vlTOPp->CLK;
     vlTOPp->__Vclklast__TOP__RESET = vlTOPp->RESET;
@@ -248,7 +252,7 @@ void VMIPS::_eval_settle(VMIPS__Syms* __restrict vlSymsp) {
     vlSymsp->TOP__v__ID._settle__TOP__v__ID__8(vlSymsp);
     vlSymsp->TOP__v__ID__RegFile._sequent__TOP__v__ID__RegFile__4(vlSymsp);
     vlTOPp->_settle__TOP__10(vlSymsp);
-    vlSymsp->TOP__v__ID._settle__TOP__v__ID__10(vlSymsp);
+    vlSymsp->TOP__v__ID._settle__TOP__v__ID__11(vlSymsp);
 }
 
 QData VMIPS::_change_request(VMIPS__Syms* __restrict vlSymsp) {

@@ -76,6 +76,8 @@ VL_CTOR_IMP(VMIPS_MIPS) {
     __Vdlyvset__instr_cache_L1__DOT__icache__v0 = VL_RAND_RESET_I(1);
     __Vdly__instr_cache_L1__DOT__counter = VL_RAND_RESET_I(32);
     __Vdly__Instr_PC_Plus4_IFID = VL_RAND_RESET_I(32);
+    __Vdly__Instr1_IFID = VL_RAND_RESET_I(32);
+    __Vdly__Instr_PC_IFID = VL_RAND_RESET_I(32);
     __Vdly__WriteRegister1_MEMWB = VL_RAND_RESET_I(5);
     __Vdly__RegWrite1_MEMWB = VL_RAND_RESET_I(1);
     __Vdly__WriteData1_MEMWB = VL_RAND_RESET_I(32);
@@ -96,7 +98,7 @@ void VMIPS_MIPS::_initial__TOP__v__1(VMIPS__Syms* __restrict vlSymsp) {
     VL_DEBUG_IF(VL_PRINTF("      VMIPS_MIPS::_initial__TOP__v__1\n"); );
     VMIPS* __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
-    // INITIAL at verilog/MIPS.v:286
+    // INITIAL at verilog/MIPS.v:298
     vlSymsp->TOP__v.data_valid_fDC = 1U;
     // INITIAL at verilog//instr_cache_L1.v:38
     vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__i = 0U;
@@ -136,6 +138,8 @@ void VMIPS_MIPS::_sequent__TOP__v__2(VMIPS__Syms* __restrict vlSymsp) {
 	= vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__counter;
     vlSymsp->TOP__v.__Vdlyvset__instr_cache_L1__DOT__icache__v0 = 0U;
     vlSymsp->TOP__v.__Vdly__Instr_PC_Plus4_IFID = vlSymsp->TOP__v.__PVT__Instr_PC_Plus4_IFID;
+    vlSymsp->TOP__v.__Vdly__Instr_PC_IFID = vlSymsp->TOP__v.__PVT__Instr_PC_IFID;
+    vlSymsp->TOP__v.__Vdly__Instr1_IFID = vlSymsp->TOP__v.__PVT__Instr1_IFID;
     vlSymsp->TOP__v.__Vdly__WriteRegister1_MEMWB = vlSymsp->TOP__v.__PVT__WriteRegister1_MEMWB;
     vlSymsp->TOP__v.__Vdly__RegWrite1_MEMWB = vlSymsp->TOP__v.__PVT__RegWrite1_MEMWB;
     vlSymsp->TOP__v.__Vdly__WriteData1_MEMWB = vlSymsp->TOP__v.__PVT__WriteData1_MEMWB;
@@ -171,7 +175,7 @@ void VMIPS_MIPS::_sequent__TOP__v__2(VMIPS__Syms* __restrict vlSymsp) {
 	    vlSymsp->TOP__v.__Vdly__mem_addressL1IM = 0U;
 	    vlSymsp->TOP__v.__Vdly__mem_reqL1IM = 0U;
 	}
-	if (VL_UNLIKELY((8U == vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__counter))) {
+	if (VL_UNLIKELY((6U == vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__counter))) {
 	    vlSymsp->TOP__v.__Vdlyvval__instr_cache_L1__DOT__icache__v0[0U] 
 		= vlTOPp->block_read_fIM[0U];
 	    vlSymsp->TOP__v.__Vdlyvval__instr_cache_L1__DOT__icache__v0[1U] 
@@ -201,7 +205,7 @@ void VMIPS_MIPS::_sequent__TOP__v__2(VMIPS__Syms* __restrict vlSymsp) {
 				 >> 5U)),1,(IData)(vlSymsp->TOP__v.__PVT__hitL1IF));
 	    fflush (stdout);
 	}
-	if ((9U == vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__counter)) {
+	if ((7U == vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__counter)) {
 	    vlSymsp->TOP__v.__Vdly__instr_cache_L1__DOT__start_count = 0U;
 	    vlSymsp->TOP__v.__Vdly__instr_cache_L1__DOT__counter = 0U;
 	}
@@ -215,6 +219,56 @@ void VMIPS_MIPS::_sequent__TOP__v__2(VMIPS__Syms* __restrict vlSymsp) {
 	vlSymsp->TOP__v.__Vdly__mem_reqL1IM = 0U;
 	vlSymsp->TOP__v.__Vdly__mem_addressL1IM = 0U;
 	vlSymsp->TOP__v.__Vdly__instr_cache_L1__DOT__start_count = 0U;
+    }
+    // ALWAYS at verilog//IF.v:57
+    if (VL_LIKELY(vlTOPp->RESET)) {
+	if (vlTOPp->CLK) {
+	    if (vlSymsp->TOP__v__ID.__PVT__WANT_FREEZE) {
+		if (vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC) {
+		    vlSymsp->TOP__v.__Vdly__Instr_PC_Plus4_IFID 
+			= vlSymsp->TOP__v.Instr_address_2IC;
+		}
+		if (VL_UNLIKELY((1U & ((~ (IData)(vlSymsp->TOP__v__ID.__PVT__syscal1)) 
+				       & (~ (IData)(vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC1)))))) {
+		    VL_WRITEF("FETCH: Now clean the Instr1_OUT\n");
+		    fflush (stdout);
+		    vlSymsp->TOP__v.__Vdly__Instr1_IFID = 0U;
+		    vlSymsp->TOP__v.__Vdly__Instr_PC_IFID = 0U;
+		}
+		if (VL_UNLIKELY(((IData)(vlSymsp->TOP__v__ID.__PVT__SYS) 
+				 & (2U == (IData)(vlSymsp->TOP__v__ID.__PVT__sys_count))))) {
+		    VL_WRITEF("FETCH:SYSCALL IS %x\n",
+			      3,vlSymsp->TOP__v__ID.__PVT__sys_count);
+		    fflush (stdout);
+		    vlSymsp->TOP__v.__Vdly__Instr1_IFID = 0U;
+		    vlSymsp->TOP__v.__Vdly__Instr_PC_IFID = 0U;
+		}
+		VL_WRITEF("FETCH: Stalling; next request will be %x and sys is %x, bubble sys_count is %x\n",
+			  32,vlSymsp->TOP__v.Instr_address_2IC,
+			  1,(IData)(vlSymsp->TOP__v__ID.__PVT__SYS),
+			  3,vlSymsp->TOP__v__ID.__PVT__sys_count);
+		fflush (stdout);
+	    } else {
+		vlSymsp->TOP__v.__Vdly__Instr1_IFID 
+		    = vlSymsp->TOP__v.__PVT__Instr1_fIC;
+		vlSymsp->TOP__v.__Vdly__Instr_PC_IFID 
+		    = vlSymsp->TOP__v.Instr_address_2IC;
+		vlSymsp->TOP__v.__Vdly__Instr_PC_Plus4_IFID 
+		    = ((IData)(4U) + vlSymsp->TOP__v.Instr_address_2IC);
+		VL_WRITEF("FETCH:Instr@%x=%x;Next@%x\n",
+			  32,vlSymsp->TOP__v.Instr_address_2IC,
+			  32,vlSymsp->TOP__v.__PVT__Instr1_fIC,
+			  32,((IData)(4U) + vlSymsp->TOP__v.Instr_address_2IC));
+		fflush (stdout);
+	    }
+	}
+    } else {
+	VL_WRITEF("FETCH [RESET] Fetching @%x\n",32,
+		  vlSymsp->TOP__v.__PVT__Instr_PC_Plus4_IFID);
+	fflush (stdout);
+	vlSymsp->TOP__v.__Vdly__Instr1_IFID = 0U;
+	vlSymsp->TOP__v.__Vdly__Instr_PC_IFID = 0U;
+	vlSymsp->TOP__v.__Vdly__Instr_PC_Plus4_IFID = 0xbfc00000U;
     }
     // ALWAYS at verilog//MEM.v:286
     if (VL_LIKELY(vlTOPp->RESET)) {
@@ -275,6 +329,7 @@ void VMIPS_MIPS::_sequent__TOP__v__2(VMIPS__Syms* __restrict vlSymsp) {
 	vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache[(IData)(vlSymsp->TOP__v.__Vdlyvdim0__instr_cache_L1__DOT__icache__v0)][8U] 
 	    = vlSymsp->TOP__v.__Vdlyvval__instr_cache_L1__DOT__icache__v0[8U];
     }
+    vlSymsp->TOP__v.__PVT__Instr_PC_Plus4_IFID = vlSymsp->TOP__v.__Vdly__Instr_PC_Plus4_IFID;
 }
 
 void VMIPS_MIPS::_combo__TOP__v__3(VMIPS__Syms* __restrict vlSymsp) {
@@ -293,39 +348,8 @@ void VMIPS_MIPS::_sequent__TOP__v__5(VMIPS__Syms* __restrict vlSymsp) {
     vlSymsp->TOP__v.__PVT__WriteRegister1_MEMWB = vlSymsp->TOP__v.__Vdly__WriteRegister1_MEMWB;
     vlSymsp->TOP__v.__PVT__RegWrite1_MEMWB = vlSymsp->TOP__v.__Vdly__RegWrite1_MEMWB;
     vlSymsp->TOP__v.__PVT__WriteData1_MEMWB = vlSymsp->TOP__v.__Vdly__WriteData1_MEMWB;
-    // ALWAYS at verilog//IF.v:53
-    if (VL_LIKELY(vlTOPp->RESET)) {
-	if (vlTOPp->CLK) {
-	    if ((1U & ((((IData)(vlSymsp->TOP__v__ID.__PVT__FORCE_FREEZE) 
-			 | (IData)(vlSymsp->TOP__v__ID.__PVT__syscal1)) 
-			& (~ (IData)(vlSymsp->TOP__v__ID.__PVT__INHIBIT_FREEZE))) 
-		       | (~ (IData)(vlSymsp->TOP__v.__PVT__hitL1IF))))) {
-		VL_WRITEF("FETCH: Stalling; next request will be %x\n",
-			  32,vlSymsp->TOP__v.Instr_address_2IC);
-		fflush (stdout);
-	    } else {
-		vlSymsp->TOP__v.__PVT__Instr1_IFID 
-		    = vlSymsp->TOP__v.__PVT__Instr1_fIC;
-		vlSymsp->TOP__v.__PVT__Instr_PC_IFID 
-		    = vlSymsp->TOP__v.Instr_address_2IC;
-		vlSymsp->TOP__v.__Vdly__Instr_PC_Plus4_IFID 
-		    = ((IData)(4U) + vlSymsp->TOP__v.Instr_address_2IC);
-		VL_WRITEF("FETCH:Instr@%x=%x;Next@%x\n",
-			  32,vlSymsp->TOP__v.Instr_address_2IC,
-			  32,vlSymsp->TOP__v.__PVT__Instr1_fIC,
-			  32,((IData)(4U) + vlSymsp->TOP__v.Instr_address_2IC));
-		fflush (stdout);
-	    }
-	}
-    } else {
-	VL_WRITEF("FETCH [RESET] Fetching @%x\n",32,
-		  vlSymsp->TOP__v.__PVT__Instr_PC_Plus4_IFID);
-	fflush (stdout);
-	vlSymsp->TOP__v.__PVT__Instr1_IFID = 0U;
-	vlSymsp->TOP__v.__PVT__Instr_PC_IFID = 0U;
-	vlSymsp->TOP__v.__Vdly__Instr_PC_Plus4_IFID = 0xbfc00000U;
-    }
-    vlSymsp->TOP__v.__PVT__Instr_PC_Plus4_IFID = vlSymsp->TOP__v.__Vdly__Instr_PC_Plus4_IFID;
+    vlSymsp->TOP__v.__PVT__Instr_PC_IFID = vlSymsp->TOP__v.__Vdly__Instr_PC_IFID;
+    vlSymsp->TOP__v.__PVT__Instr1_IFID = vlSymsp->TOP__v.__Vdly__Instr1_IFID;
     vlSymsp->TOP__v.Instr_address_2IC = ((IData)(vlSymsp->TOP__v__ID.__PVT__Request_Alt_PC)
 					  ? vlSymsp->TOP__v__ID.__PVT__Alt_PC
 					  : vlSymsp->TOP__v.__PVT__Instr_PC_Plus4_IFID);
@@ -1382,13 +1406,6 @@ void VMIPS_MIPS::_sequent__TOP__v__8(VMIPS__Syms* __restrict vlSymsp) {
 	= vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache
 	[(0x3ffU & (vlSymsp->TOP__v.Instr_address_2IC 
 		    >> 5U))][8U];
-    vlSymsp->TOP__v.__PVT__hitL1IF = ((vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[8U] 
-				       >> 0x11U) & 
-				      ((0x1ffffU & 
-					(vlSymsp->TOP__v.Instr_address_2IC 
-					 >> 0xfU)) 
-				       == (0x1ffffU 
-					   & vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[8U])));
     // ALWAYS at verilog//instr_cache_L1.v:89
     vlSymsp->TOP__v.__PVT__Instr1_fIC = (((((((((7U 
 						 == 
@@ -1482,6 +1499,13 @@ void VMIPS_MIPS::_sequent__TOP__v__8(VMIPS__Syms* __restrict vlSymsp) {
 						       : 
 						      vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[7U])))))))
 					  : vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[7U]);
+    vlSymsp->TOP__v.__PVT__hitL1IF = ((vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[8U] 
+				       >> 0x11U) & 
+				      ((0x1ffffU & 
+					(vlSymsp->TOP__v.Instr_address_2IC 
+					 >> 0xfU)) 
+				       == (0x1ffffU 
+					   & vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[8U])));
 }
 
 void VMIPS_MIPS::_settle__TOP__v__9(VMIPS__Syms* __restrict vlSymsp) {
@@ -1492,13 +1516,6 @@ void VMIPS_MIPS::_settle__TOP__v__9(VMIPS__Syms* __restrict vlSymsp) {
 					 ? vlSymsp->TOP__v.__PVT__MEM__DOT__MemWriteAddress
 					 : (0xfffffffcU 
 					    & vlSymsp->TOP__v__EXE.__PVT__ALU_result1_OUT));
-    vlSymsp->TOP__v.__PVT__hitL1IF = ((vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[8U] 
-				       >> 0x11U) & 
-				      ((0x1ffffU & 
-					(vlSymsp->TOP__v.Instr_address_2IC 
-					 >> 0xfU)) 
-				       == (0x1ffffU 
-					   & vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[8U])));
     // ALWAYS at verilog//instr_cache_L1.v:89
     vlSymsp->TOP__v.__PVT__Instr1_fIC = (((((((((7U 
 						 == 
@@ -1592,4 +1609,11 @@ void VMIPS_MIPS::_settle__TOP__v__9(VMIPS__Syms* __restrict vlSymsp) {
 						       : 
 						      vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[7U])))))))
 					  : vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[7U]);
+    vlSymsp->TOP__v.__PVT__hitL1IF = ((vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[8U] 
+				       >> 0x11U) & 
+				      ((0x1ffffU & 
+					(vlSymsp->TOP__v.Instr_address_2IC 
+					 >> 0xfU)) 
+				       == (0x1ffffU 
+					   & vlSymsp->TOP__v.__PVT__instr_cache_L1__DOT__icache_data[8U])));
 }
