@@ -122,6 +122,7 @@ module MIPS (
     IF IF(
         .CLK(CLK),
         .RESET(RESET),
+        .miss(missDCache),
         .Instr1_OUT(Instr1_IFID),
         .Instr_PC_OUT(Instr_PC_IFID),
         .Instr_PC_Plus4(Instr_PC_Plus4_IFID),
@@ -166,10 +167,11 @@ module MIPS (
     wire        BypassValid1_MEMID;
 `endif
     
-	
+	 
 	ID ID(
 		.CLK(CLK),
 		.RESET(RESET),
+        .miss(missDCache),
 		.Instr1_IN(Instr1_IFID),
 		.Instr_PC_IN(Instr_PC_IFID),
 		.Instr_PC_Plus4_IN(Instr_PC_Plus4_IFID),
@@ -236,6 +238,7 @@ module MIPS (
 	EXE EXE(
 		.CLK(CLK),
 		.RESET(RESET),
+        .miss(missDCache),
 		.Instr1_IN(Instr1_IDEXE),
 		.Instr1_PC_IN(Instr1_PC_IDEXE),
 `ifdef HAS_FORWARDING
@@ -289,27 +292,59 @@ module MIPS (
     wire        flush_2DC/*verilator public*/;
     /* verilator lint_on UNUSED */
     wire        data_valid_fDC /*verilator public*/;
-    assign data_write_2DM = data_write_2DC;
-    assign data_address_2DM = data_address_2DC;
-    assign data_write_size_2DM = data_write_size_2DC;
-    assign data_read_fDC = data_read_fDM;
-    assign MemRead_2DM = read_2DC;
-    assign MemWrite_2DM = write_2DC;
+    wire        missDCache;
+    wire        mem_write_block;
+    wire        mem_read_block;
+    
     assign data_valid_fDC = 1'b1;
      
-    assign dBlkRead = 1'b0;
-    assign dBlkWrite = 1'b0;
-    assign block_write_2DM = block_read_fDM;
+    assign dBlkRead = mem_read_block;
+    assign dBlkWrite = mem_write_block;
+    
     /*verilator lint_off UNUSED*/
-    wire unused_d1;
-    wire unused_d2;
+    wire [31:0] unused_d1;
+    //wire [31:0] unused_d2;
+    //wire [1:0]unused_d3;
+
     /*verilator lint_on UNUSED*/
-    assign unused_d1 = block_read_fDM_valid;
-    assign unused_d2 = block_write_fDM_valid;
+    assign unused_d1 = data_read_fDM;
+    assign data_write_2DM = 32'b0;
+    assign data_write_size_2DM = 2'b0;
+    assign MemRead_2DM = 0;
+    assign MemWrite_2DM = 0;
+    //assign unused_d2 = data_write_2DM;
+    //assign unused_d3 = data_write_size_2DM;
+
+
+    data_cache_L1 data_cache_L1(
+    //control
+    .CLK(CLK),
+    .RESET(RESET),
+
+    //memory write
+    .mem_write_req(mem_write_block),
+    .mem_write_addr(data_address_2DM),
+    .mem_write_data(block_write_2DM),
+    .mem_write_valid(block_write_fDM_valid),
+    //memory read
+    .mem_read_req(mem_read_block),
+    .mem_read_addr(data_address_2DM),
+    .mem_read_data(block_read_fDM),
+    .mem_read_valid(block_read_fDM_valid),
+    //processor side
+    .data_write_2C(data_write_2DC),
+    .data_address_2C(data_address_2DC),
+    .data_write_size_2C(data_write_size_2DM),
+    .data_read_fC(data_read_fDC),
+    .cache_read(read_2DC),
+    .cache_write(write_2DC),
+    .miss(missDCache)
+    );
      
     MEM MEM(
         .CLK(CLK),
         .RESET(RESET),
+        .miss(missDCache),
         .Instr1_IN(Instr1_EXEMEM),
         .Instr1_PC_IN(Instr1_PC_EXEMEM),
         .ALU_result1_IN(ALU_result1_EXEMEM),

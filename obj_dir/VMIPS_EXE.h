@@ -19,6 +19,7 @@ VL_MODULE(VMIPS_EXE) {
     // PORTS
     VL_IN8(__PVT__CLK,0,0);
     VL_IN8(__PVT__RESET,0,0);
+    VL_IN8(__PVT__miss,0,0);
     VL_IN8(__PVT__RegisterA1_IN,4,0);
     VL_IN8(__PVT__RegisterB1_IN,4,0);
     VL_IN8(__PVT__WriteRegister1_IN,4,0);
@@ -35,7 +36,7 @@ VL_MODULE(VMIPS_EXE) {
     VL_IN8(__PVT__BypassReg1_MEMEXE,4,0);
     VL_IN8(__PVT__BypassValid1_MEMEXE,0,0);
     VL_OUT8(__PVT__ALU_result_async_valid1,0,0);
-    //char	__VpadToAlign18[2];
+    //char	__VpadToAlign19[1];
     VL_IN(__PVT__Instr1_IN,31,0);
     VL_IN(__PVT__Instr1_PC_IN,31,0);
     VL_IN(__PVT__OperandA1_IN,31,0);

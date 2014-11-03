@@ -21,6 +21,7 @@
 module MEM(
     input CLK,
     input RESET,
+    input  miss,
     //Currently executing instruction [debug only]
     input [31:0] Instr1_IN,
     //PC of executing instruction [debug only]
@@ -99,13 +100,14 @@ module MEM(
      
 	 wire comment1;
 	 assign comment1 = 1;
-	 
 
-always @(data_read_fDM) begin
+
+always @(*) begin
 	//$display("MEM Received:data_read_fDM=%x",data_read_fDM);
-	data_read_aligned = MemoryData;
+	
 	//$display("Updated DRA");
-	MemWriteAddress = ALU_result;
+	 
+	 data_read_aligned = MemoryData;	
 	case(ALU_Control)
 		6'b101101: begin
 `ifdef INCLUDE_MEM_CONTENT
@@ -192,6 +194,18 @@ always @(data_read_fDM) begin
 			data_read_aligned = data_read_fDM;
 			data_write_size_2DM=0;
 		end
+
+		default:
+			data_read_aligned = data_read_fDM;
+	endcase
+
+end
+
+always@(*)
+begin
+	MemWriteAddress = ALU_result;
+	case(ALU_Control)
+
 		6'b101111: begin	//SB
 			data_write_size_2DM=1;
 `ifdef INCLUDE_MEM_CONTENT
@@ -250,7 +264,7 @@ always @(data_read_fDM) begin
 		end
 		default: begin
 		  //If it's not a real memory istruction, do something somewhat related?
-			data_read_aligned = data_read_fDM;
+
 			data_write_size_2DM=0;
 		end
 	endcase
@@ -260,6 +274,7 @@ always @(data_read_fDM) begin
     //Since it's not set elsewhere (that's your job), we'll set a dummy value here:
     data_write_2DM=32'hCAFEDEAD;
 `endif
+
 end
 
 `ifdef HAS_FORWARDING
@@ -292,14 +307,26 @@ always @(posedge CLK or negedge RESET) begin
 		WriteData1_OUT <= 0;
 		$display("MEM:RESET");
 	end else if(CLK) begin
-			Instr1_OUT <= Instr1_IN;
-			Instr1_PC_OUT <= Instr1_PC_IN;
-			WriteRegister1_OUT <= WriteRegister1_IN;
-			RegWrite1_OUT <= RegWrite1_IN;
-			WriteData1_OUT <= WriteData1;
+			if(~miss)
+			begin
+				Instr1_OUT <= Instr1_IN;
+				Instr1_PC_OUT <= Instr1_PC_IN;
+				WriteRegister1_OUT <= WriteRegister1_IN;
+				RegWrite1_OUT <= RegWrite1_IN;
+				WriteData1_OUT <= WriteData1;
+			end
+			else
+			begin
+				Instr1_OUT <= 0;
+				Instr1_PC_OUT <= 0;
+				WriteRegister1_OUT <= 0;
+				RegWrite1_OUT <= 0;
+				WriteData1_OUT <= 0;				
+			end
 			if(comment1) begin
-				$display("MEM:Instr1=%x,Instr1_PC=%x,WriteData1=%x; Write?%d to %d",Instr1_IN,Instr1_PC_IN,WriteData1, RegWrite1_IN, WriteRegister1_IN);
+				$display("MEM:Now miss= %x, Instr1=%x,Instr1_PC=%x,WriteData1=%x; Write?%d to %d",miss,Instr1_IN,Instr1_PC_IN,WriteData1, RegWrite1_IN, WriteRegister1_IN);
 				$display("MEM:data_address_2DM=%x; data_write_2DM(%d)=%x(%d); data_read_fDM(%d)=%x",data_address_2DM,MemWrite_2DM,data_write_2DM,data_write_size_2DM,MemRead_2DM,data_read_fDM);
+				$display("MEM:data_read_aligned: %x", data_read_aligned);
 			end
 	end
 end

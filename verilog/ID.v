@@ -21,6 +21,7 @@
 module ID(
     input CLK,
     input RESET,
+    input miss,
 	 //Instruction from Fetch
     input[31:0]Instr1_IN,
 	 //PC of instruction fetched
@@ -146,6 +147,7 @@ module ID(
 //Begin branch/jump calculation
 	
 	 wire [31:0] rsval_jump1;
+
 
 
 
@@ -281,7 +283,7 @@ RegFile RegFile (
 	 
 	 reg FORCE_FREEZE;
 	 reg INHIBIT_FREEZE;
-     assign WANT_FREEZE = (((FORCE_FREEZE | syscal1) && !INHIBIT_FREEZE) | (!hit));
+     assign WANT_FREEZE = (((FORCE_FREEZE | syscal1) && !INHIBIT_FREEZE) | (!hit) | (miss));
 	 
 always @(posedge CLK or negedge RESET) begin
 	if(!RESET) begin
@@ -360,6 +362,8 @@ always @(posedge CLK or negedge RESET) begin
 				0: begin
                     begin
 					//$display("ID: send instr");
+                    if(~miss)
+                    begin
                     Instr1_OUT <= Instr1_IN;
                     OperandA1_OUT <= OpA1;
                     OperandB1_OUT <= OpB1;
@@ -373,6 +377,7 @@ always @(posedge CLK or negedge RESET) begin
                     MemWrite1_OUT <= MemWrite1;
                     ShiftAmount1_OUT <= shiftAmount1;
                     Instr1_PC_OUT <= Instr_PC_IN;
+                    end
 					end
                     end
 			endcase

@@ -10,6 +10,7 @@ module  IF
 (
     input CLK,
     input RESET,
+    input miss,
     
     //This should contain the fetched instruction
     output reg [31:0] Instr1_OUT,
@@ -77,13 +78,13 @@ always @(posedge CLK or negedge RESET) begin
             if(Request_Alt_PC)
                 Instr_PC_Plus4<=Instr_address_2IM;
 
-            if((!syscall_ins)&(!Request_Alt_PC1))
+            if((!syscall_ins)&(!Request_Alt_PC1)&(!miss))
             begin
                 Instr1_OUT <= 0;
                 Instr_PC_OUT <= 0;
                 $display("FETCH: Now clean the Instr1_OUT");
             end        
-            if(SYS&(sys_count==2))
+            if(SYS&(sys_count==2)&(!miss))
                 begin
                 Instr1_OUT <= 0;
                 Instr_PC_OUT <= 0;
