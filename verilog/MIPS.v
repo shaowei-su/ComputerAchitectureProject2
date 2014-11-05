@@ -334,7 +334,7 @@ module MIPS (
     //processor side
     .data_write_2C(data_write_2DC),
     .data_address_2C(data_address_2DC),
-    .data_write_size_2C(data_write_size_2DM),
+    .data_write_size_2C(data_write_size_2DC),
     .data_read_fC(data_read_fDC),
     .cache_read(read_2DC),
     .cache_write(write_2DC),

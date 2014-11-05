@@ -324,7 +324,7 @@ always @(posedge CLK or negedge RESET) begin
 				WriteData1_OUT <= 0;				
 			end
 			if(comment1) begin
-				$display("MEM:Now miss= %x, Instr1=%x,Instr1_PC=%x,WriteData1=%x; Write?%d to %d",miss,Instr1_IN,Instr1_PC_IN,WriteData1, RegWrite1_IN, WriteRegister1_IN);
+				$display("MEM:Now miss= %x, Instr1=%x,Instr1_PC=%x,WriteData1=%x; Write?%d to %d, data write size=%x",miss,Instr1_IN,Instr1_PC_IN,WriteData1, RegWrite1_IN, WriteRegister1_IN, data_write_size_2DM);
 				$display("MEM:data_address_2DM=%x; data_write_2DM(%d)=%x(%d); data_read_fDM(%d)=%x",data_address_2DM,MemWrite_2DM,data_write_2DM,data_write_size_2DM,MemRead_2DM,data_read_fDM);
 				$display("MEM:data_read_aligned: %x", data_read_aligned);
 			end
