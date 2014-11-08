@@ -52,6 +52,9 @@ module EXE(
     input MemWrite1_IN,
     //Shift amount (needed for shift operations)
     input [4:0] ShiftAmount1_IN,
+
+  //  input flushIN,
+  //  output reg flushOUT,
     //Instruction [debug] to MEM
     output reg [31:0] Instr1_OUT,
     //PC [debug] to MEM
@@ -183,6 +186,7 @@ always @(posedge CLK or negedge RESET) begin
 		ALU_Control1_OUT <= 0;
 		MemRead1_OUT <= 0;
 		MemWrite1_OUT <= 0;
+       // flushOUT <= 0;
 		$display("EXE:RESET");
 	end else if(CLK) begin
             if(!miss)
@@ -198,6 +202,7 @@ always @(posedge CLK or negedge RESET) begin
             ALU_Control1_OUT <= ALU_Control1_IN;
             MemRead1_OUT <= MemRead1_IN;
             MemWrite1_OUT <= MemWrite1_IN;
+          //  flushOUT <= flushIN;
             end
 			if(comment1) begin
                 $display("EXE:Instr1=%x,Instr1_PC=%x,ALU_result1=%x; Write?%d to %d",Instr1_IN,Instr1_PC_IN,ALU_result1, RegWrite1_IN, WriteRegister1_IN);

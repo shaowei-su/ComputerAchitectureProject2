@@ -37,6 +37,7 @@ module ID(
 	 input RegWrite1_IN,
 	 
      input hit,
+     input flush_finished,
 	 //Alternate PC for next fetch (branch/jump destination)
     output reg [31:0]Alt_PC,
     //Actually use alternate PC
@@ -87,7 +88,8 @@ module ID(
 	 output WANT_FREEZE,
      output reg [2:0]sys_count,
      output Request_Alt_PC1,
-     output syscall_ins
+     output syscall_ins,
+     output flush
     );
 	 
 	 wire [5:0]	ALU_control1;	//async. ALU_Control output
@@ -311,35 +313,61 @@ always @(posedge CLK or negedge RESET) begin
             Alt_PC <= Alt_PC1;
             Request_Alt_PC <= WANT_FREEZE?0:Request_Alt_PC1;
             sys_count <= syscall_bubble_counter;
-            begin
+            begin 
 			//$display("ID:evaluation SBC=%d; syscal1=%d",syscall_bubble_counter,syscal1);
-			case (syscall_bubble_counter)
-				5,4,3: begin
-					//$display("ID:Decrement sbc");
-					syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
-					end
-				2: begin
-					//$display("ID:Decrement sbc, , send sys");
-					syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
-					SYS <= (ALU_control1 != 6'b101000) && (ALU_control1 != 6'b110110);  //We do a flush on LL/SC, but don't need to tell sim_main.
-					INHIBIT_FREEZE <=1;
-					end
-				1: begin
-					//$display("ID:Decrement sbc, inhibit freeze, clear sys");
 
-					syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
-					SYS <= 0;
-					INHIBIT_FREEZE <=0;
-                    end
-				0: begin
-					//$display("ID:reenable freezes");
-					INHIBIT_FREEZE <=0;
-					end
-			endcase
+            if(syscal1 && (syscall_bubble_counter==1)) begin
+                //$display("ID:init SBC");
+                    syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
+                    SYS <= 0;
+                    INHIBIT_FREEZE <=0;
+                    flush <= 0;
+
+            end
+            if(syscal1 && (syscall_bubble_counter==2) && (!flush_finished)) begin
+                //$display("ID:init SBC");
+                flush <= 1;
+            end
+
+            if(syscal1 && (syscall_bubble_counter==2) && flush_finished) begin
+                //$display("ID:init SBC");
+                syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
+                SYS <= (ALU_control1 != 6'b101000) && (ALU_control1 != 6'b110110);  //We do a flush on LL/SC, but don't need to tell sim_main.
+                INHIBIT_FREEZE <=1;
+                flush <= 0;                
+
+            end
+
+            if(syscal1 && (syscall_bubble_counter==5)) begin
+                //$display("ID:init SBC");
+                syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
+                flush <= 0;
+
+            end
+
+            if(syscal1 && (syscall_bubble_counter==4)) begin
+                //$display("ID:init SBC");
+                syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
+                flush <= 0;
+
+            end
+
+            if(syscal1 && (syscall_bubble_counter==3)) begin
+                //$display("ID:init SBC");
+                syscall_bubble_counter <= syscall_bubble_counter - 3'b1;
+                flush <= 0;
+               
+            end
+
 			if(syscal1 && (syscall_bubble_counter==0)) begin
 				//$display("ID:init SBC");
 				syscall_bubble_counter <= 4;
+                flush <= 0;
 			end
+
+
+
+
 			//$display("sc1,sbc=%d",{syscal1,syscall_bubble_counter});
 			case ({syscal1,syscall_bubble_counter})
 				8,13,12,11,
@@ -357,12 +385,14 @@ always @(posedge CLK or negedge RESET) begin
 					MemRead1_OUT <= 0;
 					MemWrite1_OUT <= 0;
 					ShiftAmount1_OUT <= 0;
+                   // flush <= 0;
+
 					end
-				10,
-				0: begin
+				0:
+				 begin
+                    if(!miss)
                     begin
 					//$display("ID: send instr");
-                    if(~miss)
                     begin
                     Instr1_OUT <= Instr1_IN;
                     OperandA1_OUT <= OpA1;
@@ -377,9 +407,34 @@ always @(posedge CLK or negedge RESET) begin
                     MemWrite1_OUT <= MemWrite1;
                     ShiftAmount1_OUT <= shiftAmount1;
                     Instr1_PC_OUT <= Instr_PC_IN;
+                   // flush <= 0;
+
                     end
-					end
+				end
+                end
+                10:
+                 begin
+                    if(!miss)
+                    begin
+                    //$display("ID: send instr");
+                    begin
+                    Instr1_OUT <= Instr1_IN;
+                    OperandA1_OUT <= OpA1;
+                    OperandB1_OUT <= OpB1;
+                    ReadRegisterA1_OUT <= RegA1;
+                    ReadRegisterB1_OUT <= RegB1;
+                    WriteRegister1_OUT <= WriteRegister1;
+                    MemWriteData1_OUT <= MemWriteData1;
+                    RegWrite1_OUT <= (WriteRegister1!=5'd0)?RegWrite1:1'd0;
+                    ALU_Control1_OUT <= ALU_control1;
+                    MemRead1_OUT <= MemRead1;
+                    MemWrite1_OUT <= MemWrite1;
+                    ShiftAmount1_OUT <= shiftAmount1;
+                    Instr1_PC_OUT <= Instr_PC_IN;
+                  //  flush <= 1;
                     end
+                end
+                end            
 			endcase
 			/*if (RegWrite_IN) begin
 				Reg[WriteRegister_IN] <= WriteData_IN;

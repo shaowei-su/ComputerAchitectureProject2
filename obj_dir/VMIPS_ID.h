@@ -25,6 +25,7 @@ VL_MODULE(VMIPS_ID) {
     VL_IN8(__PVT__WriteRegister1_IN,4,0);
     VL_IN8(__PVT__RegWrite1_IN,0,0);
     VL_IN8(__PVT__hit,0,0);
+    VL_IN8(__PVT__flush_finished,0,0);
     VL_OUT8(__PVT__Request_Alt_PC,0,0);
     VL_OUT8(__PVT__ReadRegisterA1_OUT,4,0);
     VL_OUT8(__PVT__ReadRegisterB1_OUT,4,0);
@@ -43,6 +44,8 @@ VL_MODULE(VMIPS_ID) {
     VL_OUT8(__PVT__sys_count,2,0);
     VL_OUT8(__PVT__Request_Alt_PC1,0,0);
     VL_OUT8(__PVT__syscall_ins,0,0);
+    VL_OUT8(__PVT__flush,0,0);
+    //char	__VpadToAlign26[2];
     VL_IN(__PVT__Instr1_IN,31,0);
     VL_IN(__PVT__Instr_PC_IN,31,0);
     VL_IN(__PVT__Instr_PC_Plus4_IN,31,0);
@@ -69,22 +72,26 @@ VL_MODULE(VMIPS_ID) {
     VL_SIG8(__PVT__jumpRegister_Flag1,0,0);
     VL_SIG8(__PVT__sign_or_zero_Flag1,0,0);
     VL_SIG8(__PVT__syscal1,0,0);
+    VL_SIG8(__PVT__RegA1,4,0);
+    VL_SIG8(__PVT__RegB1,4,0);
     VL_SIG8(__PVT__WriteRegister1,4,0);
     VL_SIG8(__PVT__syscall_bubble_counter,2,0);
     VL_SIG8(__PVT__FORCE_FREEZE,0,0);
     VL_SIG8(__PVT__INHIBIT_FREEZE,0,0);
+    //char	__VpadToAlign98[2];
     VL_SIG(__PVT__Alt_PC1,31,0);
+    VL_SIG(__PVT__MemWriteData1,31,0);
     VL_SIG(__PVT__OpA1,31,0);
     VL_SIG(__PVT__OpB1,31,0);
     VL_SIG(__PVT__rtval1,31,0);
     
     // LOCAL VARIABLES
     VL_SIG8(__Vdly__syscall_bubble_counter,2,0);
-    VL_SIG8(__Vdly__WriteRegister1_OUT,4,0);
-    //char	__VpadToAlign114[2];
+    //char	__VpadToAlign125[3];
     
     // INTERNAL VARIABLES
   private:
+    //char	__VpadToAlign132[4];
     VMIPS__Syms*	__VlSymsp;		// Symbol table
   public:
     

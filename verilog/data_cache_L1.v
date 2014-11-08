@@ -6,28 +6,31 @@ module data_cache_L1(
 	input RESET,
 
 	//memory write
-	output mem_write_req,
-	output [31:0] mem_write_addr,
-	output reg [255:0] mem_write_data,
+	output  mem_write_req,
+	output  [31:0] mem_write_addr,
+	output  reg [255:0] mem_write_data,
 	input mem_write_valid,
 	//memory read
-	output mem_read_req,
-	output [31:0] mem_read_addr,
+	output  mem_read_req,
+	output  [31:0] mem_read_addr,
 	input [255:0] mem_read_data,
 	input mem_read_valid,
 	//processor side
 	input [31:0] data_write_2C,
     input [31:0] data_address_2C,
 	input [1:0] data_write_size_2C,
-    output [31:0] data_read_fC,
+    output reg [31:0] data_read_fC,
 	input cache_read,
 	input cache_write,
-	output miss
+	output miss,
+	input flush,
+	output flush_finished
 	);
 
 	parameter NOACCESS = 0;
 	parameter MEM_WR = 1;
 	parameter MEM_RD = 2;
+
 
 	reg [275:0] dcache1[511:0];
 	reg [275:0] dcache2[511:0];
@@ -51,30 +54,51 @@ module data_cache_L1(
 	wire miss;
 	wire hit;
 
+	reg [31:0] cam_write_addr;
+
+
+
+
+	reg [9:0] cam_count1;
+	reg [9:0] cam_count2;
+	reg [8:0] cam_addr;
+	reg cam_stop;
+	//reg cam_choose;
+	reg [275:0] cam_data;
+	reg cam_hit;
+
 	reg [255:0] mem_read_data_local;
 
-	assign miss = ((!hit) & data_req );
+	//assign miss = ((!hit) && data_req )||(((cam_count1<512)||(cam_count2<512))&&flush);
+	assign miss = ((!hit) && data_req )||((!cam_stop)&&flush);
 
 	reg [31:0] LRUcounter1[511:0];
 	reg [31:0] LRUcounter2[511:0];
 
-	assign hit = hit1 | hit2;
-	assign data_req = cache_write | cache_read;
+	assign hit = hit1 || hit2;
+	assign data_req = cache_write || cache_read;
 
-	assign mem_write_addr = {saved_tag,saved_addr[13:5],5'b0};
+	assign cam_write_addr = {cam_data[273:256],cam_addr[8:0],5'b0};
+	
+
 	assign mem_read_addr = {data_address_2C[31:5], 5'b0};
+	assign mem_write_data = cam_hit?cam_data[255:0]:(set_choose?dcache2[saved_addr[13:5]][255:0]:dcache1[saved_addr[13:5]][255:0]);
+	assign mem_write_addr = cam_hit?cam_write_addr:({saved_tag,saved_addr[13:5],5'b0});
+
+
+
 
 	assign data_read_fC = dcache_word;
 	assign dcache_data[0] = dcache1[data_address_2C[13:5]];
 	assign dcache_data[1] = dcache2[data_address_2C[13:5]];
 
-	assign hit1 = (dcache_data[0][275]&(data_address_2C[31:14]==dcache_data[0][273:256]));
-	assign hit2 = (dcache_data[1][275]&(data_address_2C[31:14]==dcache_data[1][273:256]));
+	assign hit1 = (dcache_data[0][275]&&(data_address_2C[31:14]==dcache_data[0][273:256]));
+	assign hit2 = (dcache_data[1][275]&&(data_address_2C[31:14]==dcache_data[1][273:256]));
 
 	assign dirty1 = dcache_data[0][274];
 	assign dirty2 = dcache_data[1][274];
 
-	assign mem_write_req = (MEM_WR == state);
+	assign mem_write_req = ((MEM_WR == state)||(cam_hit));
 	assign mem_read_req = (MEM_RD == state);
 
 	assign mem_read_loaded = (counter == 8);
@@ -82,10 +106,16 @@ module data_cache_L1(
 
 	assign set_choose = (LRUcounter1[data_address_2C[13:5]]>=LRUcounter2[data_address_2C[13:5]])?0:1;
 
+
+
 	initial
 	begin
+		cam_stop = 0;
+		cam_count1 = 0;
+		cam_count2 = 0;
 		for(i=0;i<512;i=i+1)
 		begin
+			
 			dcache1[i] = 0;
 			dcache2[i] = 0;
 			LRUcounter1[i] = 0;
@@ -93,14 +123,103 @@ module data_cache_L1(
 		end  
 	end
 
+
 	always@(posedge CLK)
 	begin
-		if(hit1&data_req)
+		if(flush)
+		begin
+			flush_finished <= 0;
+			$display("DCACHE: FLUSH count: cam_count1=%x, cam_count2=%x",cam_count1,cam_count2);
+			$display("DCACHE: mem_write_req = %x, mem_write_addr=%x, mem_write_data = %x, cam_hit = %x, mem_write_valid=%x", mem_write_req, mem_write_addr, mem_write_data, cam_hit, mem_write_valid);
+			$display("DCACHE: cam_write_addr=%x, cam_write_data=%x",{cam_data[273:256],cam_addr[8:0],5'b0},cam_data[255:0]);
+			if(cam_count1<512&&(!cam_stop))
+			begin
+				if(dcache1[cam_count1[8:0]][274]&&dcache1[cam_count1[8:0]][275])
+				begin
+					cam_hit <= 1;
+					//cam_choose <= 0;
+					cam_addr <= cam_count1[8:0];
+					cam_data <= dcache1[cam_count1[8:0]];
+					LRUcounter1[cam_count1[8:0]] <= 0;
+					dcache1[cam_count1[8:0]][275] <= 0;
+					dcache1[cam_count1[8:0]][274] <= 0;
+
+					$display("cam_data=%x, cam_addr=%x",cam_data,cam_count1[8:0]);
+					$display("DCACHE: cam_write_addr=%x, cam_write_data=%x",{cam_data[273:256],cam_addr[8:0],5'b0},cam_data[255:0]);
+
+				end
+				else
+				begin
+					cam_hit <= 0;
+					dcache1[cam_count1[8:0]][275] <= 0;
+					dcache1[cam_count1[8:0]][274] <= 0;
+					LRUcounter1[cam_count1[8:0]] <= 0;
+				end
+
+				cam_count1 <= cam_count1 + 1;
+				
+
+			end
+
+			else if(cam_count2<512&&(!cam_stop))
+			begin
+				if(dcache2[cam_count2[8:0]][274]&&dcache1[cam_count1[8:0]][275])
+				begin
+					cam_hit <= 1;
+					//cam_choose <= 1;
+					cam_addr <= cam_count2[8:0];
+					cam_data <= dcache2[cam_count2[8:0]];
+					dcache2[cam_count1[8:0]][275] <= 0;
+					dcache2[cam_count1[8:0]][274] <= 0;
+					LRUcounter2[cam_count2[8:0]] <= 0;
+					$display("cam_data=%x, cam_arr=%x",cam_data,cam_count2[8:0]);
+					$display("DCACHE: cam_write_addr=%x, cam_write_data=%x",{cam_data[273:256],cam_addr[8:0],5'b0},cam_data[255:0]);
+
+				end
+				else
+				begin
+					cam_hit <= 0;
+					dcache2[cam_count1[8:0]][275] <= 0;
+					dcache2[cam_count1[8:0]][274] <= 0;
+					LRUcounter2[cam_count2[8:0]] <= 0;
+				end				
+				cam_count2 <= cam_count2 + 1;
+			
+			end
+
+			if((cam_count1==512)&&(cam_count2==512))
+			begin
+				cam_stop <= 1;
+				flush_finished <= 1;
+
+			end
+		end
+	end
+
+	always@(posedge CLK)
+	if(cam_stop)
+	begin
+		cam_count1 <= 0;
+		cam_count2 <= 0;
+		cam_stop <= 0;
+		cam_hit <= 0;
+		cam_data <= 0;
+		cam_addr <= 0;
+
+
+		flush_finished <= 0;
+
+		$display("DCACHE: Now flush finished");
+	end
+
+	always@(posedge CLK)
+	begin
+		if(hit1&&data_req)
 		begin
 			LRUcounter1[data_address_2C[13:5]] <= 0;
 			LRUcounter2[data_address_2C[13:5]] <= LRUcounter2[data_address_2C[13:5]] + 1;
 		end
-		else if(hit2&data_req)
+		else if(hit2&&data_req)
 		begin
 			LRUcounter2[data_address_2C[13:5]] <= 0;
 			LRUcounter1[data_address_2C[13:5]] <= LRUcounter1[data_address_2C[13:5]] + 1;
@@ -125,7 +244,7 @@ module data_cache_L1(
 			$display("DCACHE: store block %x to data cache at addr %x, set_choose:%x", mem_read_data_local, saved_addr, set_choose);
 
 		end
-		else if(hit&cache_write)
+		else if(hit&&cache_write)
 		begin
 		$display("DCACHE: now the data_address_2C is %x and size is %x", data_address_2C, data_write_size_2C);
 		case({data_address_2C[1:0],data_write_size_2C})
@@ -550,26 +669,6 @@ module data_cache_L1(
 		end
 	end
 
-	always@(posedge CLK or negedge RESET)
-	begin
-		if(!RESET)
-			mem_write_data <= 0;
-		else if (mem_write_req)
-		begin
-
-			if(set_choose == 0)
-				begin
-				mem_write_data <= dcache1[saved_addr[13:5]][255:0];
-				$display("DCACHE: write block %x to memory",dcache1[saved_addr[13:5]][255:0]);
-				end
-			else
-				begin
-				mem_write_data <= dcache2[saved_addr[13:5]][255:0];
-				$display("DCACHE: write block %x to memory",dcache2[saved_addr[13:5]][255:0]);
-				end
-		end
-	end
-
 	always@(*)
 		begin
 
@@ -609,21 +708,27 @@ module data_cache_L1(
 	begin
 		if(!RESET)
 			state <= NOACCESS;
-		else
+		else if(!flush)
 			case(state)
 				NOACCESS: 
-					if((~hit & (set_choose==0) & dirty1) | (~hit & (set_choose==1) & dirty2) & data_req)
+					if(((!hit && (set_choose==0) && dirty1) || (!hit && (set_choose==1) && dirty2) && data_req))
+						begin
 						state <= MEM_WR;
-					else if(~hit & data_req)
+						$display("DCACHE: now writeback, data_req=%x",data_req);
+						end
+					else if(!hit && data_req)
 						begin
 							state <= MEM_RD;
 							start_count <= 1;
 						end
 					else
 						state <= NOACCESS;
+
+
 				MEM_WR:
 					if(mem_write_valid)
 					begin
+						$display("DCACHE:write back to %x", mem_write_addr);
 						state <= MEM_RD;
 						start_count <= 1;
 					end
@@ -647,21 +752,21 @@ module data_cache_L1(
 			end
 		else
 			begin
-				if((~hit) & (set_choose==0) & dirty1 & (~mem_write_req) & (~mem_read_req) & data_req)
+			if((!hit) && (set_choose==0) && dirty1 && (!mem_write_req) && (!mem_read_req) && data_req)
 					begin
 					saved_tag <= dcache_data[0][273:256];
-					$display("DCACHE:save tag %x",dcache_data[0][273:256]);
+					$display("DCACHE:save tag %x, before %x",dcache_data[0][273:256],saved_tag);
 					end
 
-				else if(~hit & (set_choose==1) & dirty2 & (~mem_write_req) & (~mem_read_req) & data_req)
+				else if(!hit && (set_choose==1) && dirty2 && (!mem_write_req) && (!mem_read_req) && data_req)
 					begin
 					saved_tag <= dcache_data[1][273:256];
 					$display("DCACHE:save tag %x",dcache_data[1][273:256]);	
-					end
-				if(~hit&data_req)
+					end 
+				if(!hit&&data_req)
 					begin
 					saved_addr <= data_address_2C;
-					$display("DCACHE:save addr %x", data_address_2C);
+					$display("DCACHE:save addr %x and flush=%x", data_address_2C, flush);
 					end
 
 			end

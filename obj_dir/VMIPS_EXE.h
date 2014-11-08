@@ -64,10 +64,12 @@ VL_MODULE(VMIPS_EXE) {
     VL_SIG8(__Vdly__RegWrite1_OUT,0,0);
     VL_SIG8(__Vdly__MemRead1_OUT,0,0);
     VL_SIG8(__Vdly__MemWrite1_OUT,0,0);
+    VL_SIG(__Vdly__Instr1_OUT,31,0);
+    VL_SIG(__Vdly__Instr1_PC_OUT,31,0);
     
     // INTERNAL VARIABLES
   private:
-    //char	__VpadToAlign116[4];
+    //char	__VpadToAlign124[4];
     VMIPS__Syms*	__VlSymsp;		// Symbol table
   public:
     

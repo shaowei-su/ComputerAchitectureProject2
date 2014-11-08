@@ -40,6 +40,9 @@ module MEM(
     input MemRead1_IN,
     //The instruction requests a store
     input MemWrite1_IN,
+
+   // input flushIN,
+   // output reg flushOUT,
     //What register we are writing to
     output reg [4:0] WriteRegister1_OUT,
     //Actually do the write
@@ -78,6 +81,7 @@ module MEM(
 
 	 wire MemWrite;
 	 wire MemRead;
+
 	 
 	 wire [31:0] ALU_result;
 	 
@@ -100,6 +104,9 @@ module MEM(
      
 	 wire comment1;
 	 assign comment1 = 1;
+
+
+
 
 
 always @(*) begin
@@ -314,6 +321,7 @@ always @(posedge CLK or negedge RESET) begin
 				WriteRegister1_OUT <= WriteRegister1_IN;
 				RegWrite1_OUT <= RegWrite1_IN;
 				WriteData1_OUT <= WriteData1;
+				//flushOUT <= flushIN;
 			end
 			else
 			begin
@@ -321,7 +329,8 @@ always @(posedge CLK or negedge RESET) begin
 				Instr1_PC_OUT <= 0;
 				WriteRegister1_OUT <= 0;
 				RegWrite1_OUT <= 0;
-				WriteData1_OUT <= 0;				
+				WriteData1_OUT <= 0;
+				//flushOUT <= flushIN;				
 			end
 			if(comment1) begin
 				$display("MEM:Now miss= %x, Instr1=%x,Instr1_PC=%x,WriteData1=%x; Write?%d to %d, data write size=%x",miss,Instr1_IN,Instr1_PC_IN,WriteData1, RegWrite1_IN, WriteRegister1_IN, data_write_size_2DM);

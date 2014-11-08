@@ -30,7 +30,7 @@ module instr_cache_L1(
 
 
 
-	assign hit = icache_data[273] & (instr_addressIF[31:15] == icache_data[272:256]) ;
+	assign hit = icache_data[273] && (instr_addressIF[31:15] == icache_data[272:256]) ;
 	assign data_ready = (7==counter);
 	assign data_loaded = (8==counter);
 	assign icache_data = icache[instr_addressIF[14:5]];
@@ -56,7 +56,7 @@ module instr_cache_L1(
 		else begin
 
 			
-			if ((~hit)&(counter==0))
+			if ((~hit)&&(counter==0))
 			begin
 				mem_req <= 1;
 				mem_address <= {instr_addressIF[31:5],5'b0};

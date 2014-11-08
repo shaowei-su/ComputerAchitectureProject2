@@ -8,7 +8,7 @@ module MIPS (
     input CLK,
     
     //The physical memory address we want to interact with
-    output [31:0] data_address_2DM,
+    output  [31:0] data_address_2DM,
     //We want to perform a read?
     output MemRead_2DM,
     //We want to perform a write?
@@ -179,6 +179,7 @@ module MIPS (
 		.WriteData1_IN(WriteData1_MEMWB),
 		.RegWrite1_IN(RegWrite1_MEMWB),
         .hit(hitL1IF),
+        .flush_finished(flush_finished_DCID),
 		.Alt_PC(Alt_PC_IDIF),
 		.Request_Alt_PC(Request_Alt_PC_IDIF),
 		.Instr1_OUT(Instr1_IDEXE),
@@ -213,12 +214,16 @@ module MIPS (
 		.WANT_FREEZE(STALL_IDIF),
         .sys_count(sys_count_IDIF),
         .Request_Alt_PC1(Request_Alt_PC1_IDIF),
-        .syscall_ins(syscall_ins_IDIF)
+        .syscall_ins(syscall_ins_IDIF),
+        .flush(flush_IDEX)
 	);
 	
     wire [2:0] sys_count_IDIF;
     wire Request_Alt_PC1_IDIF;
     wire syscall_ins_IDIF;
+    wire flush_IDEX;
+
+   // assign flush_IDEX = SYS;
 
 	wire [31:0] Instr1_EXEMEM;
 	wire [31:0] Instr1_PC_EXEMEM;
@@ -256,6 +261,8 @@ module MIPS (
 		.MemRead1_IN(MemRead1_IDEXE),
 		.MemWrite1_IN(MemWrite1_IDEXE),
 		.ShiftAmount1_IN(ShiftAmount1_IDEXE),
+       // .flushIN(flush_IDEX),
+       // .flushOUT(flush_2DC),
 		.Instr1_OUT(Instr1_EXEMEM),
 		.Instr1_PC_OUT(Instr1_PC_EXEMEM),
 		.ALU_result1_OUT(ALU_result1_EXEMEM),
@@ -295,11 +302,37 @@ module MIPS (
     wire        missDCache;
     wire        mem_write_block;
     wire        mem_read_block;
+
+
+    wire flush_finished_DCID;
+
+    wire [31:0] data_address_write_DCME;
+
+    wire [31:0] data_address_read_DCME;
+
+    wire [255:0] block_write_DCME;
+
+    wire [255:0] block_read_MEDC;
+
+    wire block_read_fDM_valid_MEDC;
+
+    wire block_write_fDM_valid_MEDC;
+    //wire flush_EXMEM;
     
     assign data_valid_fDC = 1'b1;
+
+    assign data_address_2DM = mem_write_block?data_address_write_DCME:data_address_read_DCME;
+    
+    assign block_write_2DM = block_write_DCME;
+    assign block_read_MEDC = block_read_fDM;
      
     assign dBlkRead = mem_read_block;
     assign dBlkWrite = mem_write_block;
+
+    assign block_read_fDM_valid_MEDC = block_read_fDM_valid;
+
+    assign block_write_fDM_valid_MEDC = block_write_fDM_valid;
+
     
     /*verilator lint_off UNUSED*/
     wire [31:0] unused_d1;
@@ -323,14 +356,14 @@ module MIPS (
 
     //memory write
     .mem_write_req(mem_write_block),
-    .mem_write_addr(data_address_2DM),
-    .mem_write_data(block_write_2DM),
-    .mem_write_valid(block_write_fDM_valid),
+    .mem_write_addr(data_address_write_DCME),
+    .mem_write_data(block_write_DCME),
+    .mem_write_valid(block_write_fDM_valid_MEDC),
     //memory read
     .mem_read_req(mem_read_block),
-    .mem_read_addr(data_address_2DM),
-    .mem_read_data(block_read_fDM),
-    .mem_read_valid(block_read_fDM_valid),
+    .mem_read_addr(data_address_read_DCME),
+    .mem_read_data(block_read_MEDC),
+    .mem_read_valid(block_read_fDM_valid_MEDC),
     //processor side
     .data_write_2C(data_write_2DC),
     .data_address_2C(data_address_2DC),
@@ -338,7 +371,9 @@ module MIPS (
     .data_read_fC(data_read_fDC),
     .cache_read(read_2DC),
     .cache_write(write_2DC),
-    .miss(missDCache)
+    .miss(missDCache),
+    .flush(flush_IDEX),
+    .flush_finished(flush_finished_DCID)
     );
      
     MEM MEM(
@@ -354,6 +389,8 @@ module MIPS (
         .ALU_Control1_IN(ALU_Control1_EXEMEM),
         .MemRead1_IN(MemRead1_EXEMEM),
         .MemWrite1_IN(MemWrite1_EXEMEM),
+        //.flushIN(flush_EXMEM),
+        //.flushOUT(flush_2DC),
         .WriteRegister1_OUT(WriteRegister1_MEMWB),
         .RegWrite1_OUT(RegWrite1_MEMWB),
         .WriteData1_OUT(WriteData1_MEMWB),
